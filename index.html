@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App de Transporte</title>
+    <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+    <!-- Barra de Navegação -->
+    <nav class="top-nav" id="top-nav">
+        <ul>
+            <li><a href="#" data-screen="perfil" class="nav-link active">Perfil</a></li>
+            <li><a href="#" data-screen="rota-tempo-real" class="nav-link">Rota em Tempo Real</a></li>
+            <li><a href="#" data-screen="historico-rotas" class="nav-link">Histórico de Rotas</a></li>
+            <li><a href="#" data-screen="chat" class="nav-link">Chat</a></li>
+            <li><a href="#" data-screen="login" class="nav-link logout">Sair</a></li>
+        </ul>
+    </nav>
+
+    <div id="app">
+        <!-- Tela de Login -->
+        <section id="login" class="screen active">
+            <div class="container">
+                <div class="login-box">
+                    <img src="img/img_perfil.png" class="avatar" alt="Avatar">
+                    <h2>Login</h2>
+                    <form id="loginForm">
+                        <label for="login-email">E-mail</label>
+                        <input type="email" id="login-email" placeholder="Digite seu e-mail" required>
+                        <label for="login-senha">Senha</label>
+                        <input type="password" id="login-senha" placeholder="Digite sua senha" required>
+                        <button type="submit">ENTRAR</button>
+                        <p>Ainda não tem uma conta? <a href="#" data-screen="cadastro">Cadastre-se</a></p>
+                        <p>Esqueceu a senha? <a href="#" data-screen="Senha">Trocar senha</a></p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tela de Cadastro -->
+        <section id="cadastro" class="screen">
+            <div class="container">
+                <div class="login-box">
+                    <img src="img/img_perfil.png" class="avatar" alt="Avatar">
+                    <h2>Cadastro</h2>
+                    <form id="cadastroForm">
+                        <label for="cadastro-email">E-mail</label>
+                        <input type="email" id="cadastro-email" placeholder="Digite seu e-mail" required>
+                        <label for="cadastro-senha">Senha</label>
+                        <input type="password" id="cadastro-senha" placeholder="Digite sua senha" required>
+                        <label for="cadastro-confirma-senha">Confirmar Senha</label>
+                        <input type="password" id="cadastro-confirma-senha" placeholder="Confirme sua senha" required>
+                        <div class="role-selection">
+                            <label>Escolha seu papel:</label>
+                            <div class="role-buttons">
+                                <button type="button" class="role-btn active" data-role="responsavel">Responsável</button>
+                                <button type="button" class="role-btn" data-role="motorista">Motorista</button>
+                            </div>
+                        </div>
+                        <button type="submit">CADASTRAR</button>
+                        <p>Já tem uma conta? <a href="#" data-screen="login">Logar</a></p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tela de Perfil -->
+        <section id="perfil" class="screen">
+            <div class="profile-container">
+                <aside class="sidebar">
+                    <img src="img/img_perfil.png" class="avatar" alt="Foto">
+                    <h3 id="user-nome">Nome e Sobrenome</h3>
+                    <nav>
+                        <ul>
+                            <li><a href="#" data-section="perfil-info" class="active">Perfil</a></li>
+                            <li><a href="#" data-section="perfil-foto">Foto</a></li>
+                            <li><a href="#" data-section="perfil-seguranca">Segurança da conta</a></li>
+                        </ul>
+                    </nav>
+                </aside>
+                <main class="profile-content">
+                    <div id="perfil-info" class="profile-section active">
+                        <h2>Perfil Público</h2>
+                        <p>Adicione informações sobre você</p>
+                        <form id="perfilForm">
+                            <label for="nome">Nome</label>
+                            <input type="text" id="nome" placeholder="Digite seu nome">
+                            <label for="profissao">Profissão ou Título</label>
+                            <input type="text" id="profissao" placeholder="Digite seu título profissional">
+                            <label for="bio">Bio</label>
+                            <textarea id="bio" placeholder="Digite sua bio"></textarea>
+                            <label for="idioma">Idioma</label>
+                            <select id="idioma">
+                                <option value="pt-br">Português (Brasil)</option>
+                                <option value="en">Inglês</option>
+                                <option value="es">Espanhol</option>
+                            </select>
+                            <label for="site">Links</label>
+                            <input type="url" id="site" placeholder="Digite seu site">
+                            <button type="submit">Salvar</button>
+                        </form>
+                    </div>
+                    <div id="perfil-foto" class="profile-section">
+                        <h2>Foto do Perfil</h2>
+                        <p>Atualize sua foto de perfil</p>
+                        <div class="photo-preview">
+                            <img src="img/img_perfil.png" id="photo-preview-img" alt="Prévia da Foto">
+                        </div>
+                        <form id="fotoForm">
+                            <label for="foto-upload">Escolher nova foto</label>
+                            <input type="file" id="foto-upload" accept="image/*">
+                            <button type="submit">Salvar Foto</button>
+                        </form>
+                    </div>
+                    <div id="perfil-seguranca" class="profile-section">
+                        <h2>Segurança da Conta</h2>
+                        <p>Gerencie suas configurações de segurança</p>
+                        <form id="segurancaForm">
+                            <label for="seguranca-email">E-mail Atual</label>
+                            <input type="email" id="seguranca-email" placeholder="Seu e-mail atual" readonly>
+                            <label for="seguranca-senha-atual">Senha Atual</label>
+                            <input type="password" id="seguranca-senha-atual" placeholder="Digite sua senha atual">
+                            <label for="seguranca-senha-nova">Nova Senha</label>
+                            <input type="password" id="seguranca-senha-nova" placeholder="Digite sua nova senha">
+                            <label for="seguranca-confirma-senha">Confirmar Nova Senha</label>
+                            <input type="password" id="seguranca-confirma-senha" placeholder="Confirme sua nova senha">
+                            <button type="submit">Atualizar Senha</button>
+                        </form>
+                    </div>
+                </main>
+            </div>
+        </section>
+
+        <!-- Tela de Rota em Tempo Real -->
+        <section id="rota-tempo-real" class="screen">
+            <div class="content-container">
+                <h2>Rota em Tempo Real</h2>
+                <p>Acompanhe a localização do motorista em tempo real.</p>
+                <div id="map-placeholder" class="map">
+                    <p>[Mapa fictício - Integre uma API como Google Maps aqui]</p>
+                </div>
+                <div class="route-info">
+                    <p><strong>Status:</strong> Em andamento</p>
+                    <p><strong>Tempo estimado:</strong> 15 minutos</p>
+                    <p><strong>Distância:</strong> 5 km</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tela de Histórico de Rotas -->
+        <section id="historico-rotas" class="screen">
+            <div class="content-container">
+                <h2>Histórico de Rotas</h2>
+                <p>Veja suas rotas anteriores.</p>
+                <ul class="route-list">
+                    <li>Data: 14/03/2025 - Origem: Casa - Destino: Escola - Duração: 20 min</li>
+                    <li>Data: 13/03/2025 - Origem: Escola - Destino: Casa - Duração: 18 min</li>
+                    <li>Data: 12/03/2025 - Origem: Casa - Destino: Parque - Duração: 25 min</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Tela de Chat -->
+        <section id="chat" class="screen">
+            <div class="content-container">
+                <h2>Chat</h2>
+                <p>Comunique-se com o motorista ou responsável.</p>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message received">Olá, estou a 5 minutos da escola!</div>
+                        <div class="message sent">Ok, obrigado por avisar!</div>
+                    </div>
+                    <form id="chatForm">
+                        <input type="text" id="chat-input" placeholder="Digite sua mensagem" required>
+                        <button type="submit">Enviar</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Tela de Trocar a senha -->
+    <section id="Senha" class="screen">
+        <div class="container">
+            <div class="login-box">
+                <img src="img/img_perfil.png" class="avatar" alt="Avatar">
+                <h2>Resetar Senha</h2>
+                <form id="cadastroForm">
+                    <label for="cadastro-email">E-mail</label>
+                    <input type="email" id="cadastro-email" placeholder="Digite seu e-mail" required>
+                    <div class="role-selection">
+                    </div>
+                    <button type="submit">Enviar E-mail</button>
+                    <p>Ainda não tem uma conta? <a href="#" data-screen="cadastro">Cadastre-se</a></p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>

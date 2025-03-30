@@ -1,0 +1,379 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #121212;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+/* Barra de Navegação */
+.top-nav {
+  background: #1e1e1e;
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px; /* Altura retraída */
+  z-index: 1000;
+  display: none; /* Oculta por padrão */
+  transition: height 0.3s ease; /* Animação suave */
+  overflow: hidden; /* Evita que os botões ultrapassem a barra */
+}
+
+.top-nav.visible {
+  display: block; /* Aparece nas telas pós-login */
+  height: 20px; /* Estado inicial retraído */
+}
+
+.top-nav:hover {
+  height: 60px; /* Expande ao passar o mouse */
+}
+
+.top-nav ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  height: 100%;
+  align-items: center;
+  opacity: 0; /* Botões invisíveis quando retraída */
+  transition: opacity 0.2s ease; /* Animação para os botões aparecerem */
+}
+
+.top-nav:hover ul {
+  opacity: 1; /* Botões aparecem ao expandir */
+}
+
+.top-nav ul li {
+  margin: 0 20px;
+}
+
+.nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  padding: 10px;
+  transition: color 0.3s;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: #1e90ff;
+}
+
+.logout {
+  margin-left: auto;
+}
+
+/* Ajuste do conteúdo para não ser sobreposto */
+#app {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Aplica padding-top apenas quando a barra está visível */
+.top-nav.visible ~ #app {
+  padding-top: 70px; /* Espaço suficiente para a barra expandida (60px) + margem */
+}
+
+/* Telas */
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+/* Container para Login e Cadastro */
+.container {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+/* Container genérico para outras telas */
+.content-container {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+.login-box {
+  padding: 20px;
+}
+
+.avatar {
+  width: 80px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+h2 {
+  margin: 10px 0 20px;
+  font-size: 1.5em;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin: 5px 0;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background: #2a2a2a;
+  color: #fff;
+}
+
+button {
+  background-color: #ffffff;
+  color: #000;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #e0e0e0;
+}
+
+p {
+  margin-top: 15px;
+  font-size: 0.9em;
+}
+
+a {
+  color: #1e90ff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Seleção de Papel no Cadastro */
+.role-selection {
+  margin: 15px 0;
+}
+
+.role-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.role-btn {
+  flex: 1;
+  padding: 10px;
+  background: #2a2a2a;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.role-btn.active {
+  background: #1e90ff;
+  border-color: #1e90ff;
+}
+
+/* Estilos do Perfil */
+.profile-container {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: none;
+}
+
+.sidebar {
+  background: #1e1e1e;
+  padding: 20px;
+  width: 250px;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.profile-content {
+  padding: 20px;
+  flex: 1;
+  background: #1e1e1e;
+  border-radius: 10px;
+  margin: 20px;
+}
+
+.profile-section {
+  display: none;
+}
+
+.profile-section.active {
+  display: block;
+}
+
+nav ul {
+  list-style: none;
+  margin-top: 20px;
+}
+
+nav ul li {
+  padding: 15px 0;
+}
+
+nav ul li a {
+  color: #ffffff;
+  text-decoration: none;
+  display: block;
+}
+
+nav ul li a:hover, nav ul li a.active {
+  color: #1e90ff;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Estilos da Seção Foto */
+.photo-preview img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin: 20px 0;
+  object-fit: cover;
+}
+
+#foto-upload {
+  background: none;
+  border: none;
+  padding: 10px 0;
+}
+
+/* Estilos da Rota em Tempo Real */
+.map {
+  background: #2a2a2a;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.route-info p {
+  margin: 5px 0;
+}
+
+/* Estilos do Histórico de Rotas */
+.route-list {
+  list-style: none;
+  margin: 20px 0;
+}
+
+.route-list li {
+  padding: 10px;
+  background: #2a2a2a;
+  border-radius: 5px;
+  margin: 5px 0;
+}
+
+/* Estilos do Chat */
+.chat-container {
+  margin: 20px 0;
+}
+
+.chat-messages {
+  background: #2a2a2a;
+  padding: 10px;
+  border-radius: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.message {
+  padding: 8px 12px;
+  margin: 5px 0;
+  border-radius: 5px;
+  max-width: 70%;
+}
+
+.message.received {
+  background: #1e90ff;
+  color: #fff;
+  align-self: flex-start;
+}
+
+.message.sent {
+  background: #ffffff;
+  color: #000;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+#chatForm {
+  display: flex;
+  gap: 10px;
+}
+
+#chat-input {
+  flex: 1;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .top-nav ul {
+      flex-direction: column;
+      align-items: center;
+  }
+  .top-nav ul li {
+      margin: 5px 0;
+  }
+  .top-nav.visible {
+      height: 20px; 
+  }
+  .top-nav:hover {
+      height: 150px; 
+  }
+  .profile-container {
+      flex-direction: column;
+      margin: 0;
+  }
+  .sidebar {
+      width: 100%;
+      min-height: auto;
+      position: static;
+  }
+  .profile-content {
+      margin: 0;
+      border-radius: 0;
+  }
+  .container, .content-container {
+      max-width: 100%;
+      margin: 10px;
+  }
+  .role-buttons {
+      flex-direction: column;
+      gap: 5px;
+  }
+}
