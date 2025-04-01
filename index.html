@@ -10,12 +10,13 @@
     <!-- Barra de Navegação -->
     <nav class="top-nav" id="top-nav">
         <ul>
-            <li><a href="#" data-screen="perfil" class="nav-link active">Perfil</a></li>
+            <li><a href="#" data-screen="dashboard" class="nav-link">Dashboard</a></li>
+            <li><a href="#" data-screen="perfil" class="nav-link">Perfil</a></li>
             <li><a href="#" data-screen="rota-tempo-real" class="nav-link">Rota em Tempo Real</a></li>
             <li><a href="#" data-screen="historico-rotas" class="nav-link">Histórico de Rotas</a></li>
             <li><a href="#" data-screen="chat" class="nav-link">Chat</a></li>
-            <li><a href="#" data-screen="login" class="nav-link logout">Sair</a></li>
         </ul>
+        <button id="logout-btn" class="logout-button">Sair</button>
     </nav>
 
     <div id="app">
@@ -26,15 +27,26 @@
                     <img src="img/img_perfil.png" class="avatar" alt="Avatar">
                     <h2>Login</h2>
                     <form id="loginForm">
-                        <label for="login-email">E-mail</label>
-                        <input type="email" id="login-email" placeholder="Digite seu e-mail" required>
-                        <label for="login-senha">Senha</label>
-                        <input type="password" id="login-senha" placeholder="Digite sua senha" required>
+                        <div class="form-group">
+                            <label for="login-email">E-mail</label>
+                            <input type="email" id="login-email" placeholder="Digite seu e-mail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-senha">Senha</label>
+                            <input type="password" id="login-senha" placeholder="Digite sua senha" required>
+                        </div>
                         <button type="submit">ENTRAR</button>
                         <p>Ainda não tem uma conta? <a href="#" data-screen="cadastro">Cadastre-se</a></p>
                         <p>Esqueceu a senha? <a href="#" data-screen="Senha">Trocar senha</a></p>
                     </form>
                 </div>
+        </section>
+
+        <!-- Tela de Dashboard (adicionada) -->
+        <section id="dashboard" class="screen">
+            <div class="content-container">
+                <h2>Dashboard</h2>
+                <div id="dashboard-container"></div>
             </div>
         </section>
 
@@ -45,12 +57,18 @@
                     <img src="img/img_perfil.png" class="avatar" alt="Avatar">
                     <h2>Cadastro</h2>
                     <form id="cadastroForm">
-                        <label for="cadastro-email">E-mail</label>
-                        <input type="email" id="cadastro-email" placeholder="Digite seu e-mail" required>
-                        <label for="cadastro-senha">Senha</label>
-                        <input type="password" id="cadastro-senha" placeholder="Digite sua senha" required>
-                        <label for="cadastro-confirma-senha">Confirmar Senha</label>
-                        <input type="password" id="cadastro-confirma-senha" placeholder="Confirme sua senha" required>
+                        <div class="form-group">
+                            <label for="cadastro-email">E-mail</label>
+                            <input type="email" id="cadastro-email" placeholder="Digite seu e-mail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cadastro-senha">Senha</label>
+                            <input type="password" id="cadastro-senha" placeholder="Digite sua senha" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cadastro-confirma-senha">Confirmar Senha</label>
+                            <input type="password" id="cadastro-confirma-senha" placeholder="Confirme sua senha" required>
+                        </div>
                         <div class="role-selection">
                             <label>Escolha seu papel:</label>
                             <div class="role-buttons">
@@ -97,6 +115,7 @@
                                 <option value="es">Espanhol</option>
                             </select>
                             <label for="site">Links</label>
+                            <label class="perfiel"></label>
                             <input type="url" id="site" placeholder="Digite seu site">
                             <button type="submit">Salvar</button>
                         </form>
@@ -167,37 +186,52 @@
                 <h2>Chat</h2>
                 <p>Comunique-se com o motorista ou responsável.</p>
                 <div class="chat-container">
-                    <div class="chat-messages" id="chat-messages">
-                        <div class="message received">Olá, estou a 5 minutos da escola!</div>
-                        <div class="message sent">Ok, obrigado por avisar!</div>
+                    <div class="chat-messages-container">
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="message received">Olá, estou a 5 minutos da escola!</div>
+                            <div class="message sent">Ok, obrigado por avisar!</div>
+                        </div>
+                        <form id="chatForm">
+                            <input type="text" id="chat-input" placeholder="Digite sua mensagem" required>
+                            <button type="submit">Enviar</button>
+                        </form>
                     </div>
-                    <form id="chatForm">
-                        <input type="text" id="chat-input" placeholder="Digite sua mensagem" required>
-                        <button type="submit">Enviar</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tela de Trocar a senha -->
+        <section id="Senha" class="screen">
+            <div class="container">
+                <div class="login-box">
+                    <img src="img/img_perfil.png" class="avatar" alt="Avatar">
+                    <h2>Resetar Senha</h2>
+                    <form id="resetSenhaForm">
+                        <div class="form-group">
+                            <label for="reset-email">E-mail</label>
+                            <input type="email" id="reset-email" placeholder="Digite seu e-mail" required>
+                        </div>
+                        <button type="submit">Enviar E-mail</button>
+                        <p>Ainda não tem uma conta? <a href="#" data-screen="cadastro">Cadastre-se</a></p>
                     </form>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- Tela de Trocar a senha -->
-    <section id="Senha" class="screen">
-        <div class="container">
-            <div class="login-box">
-                <img src="img/img_perfil.png" class="avatar" alt="Avatar">
-                <h2>Resetar Senha</h2>
-                <form id="cadastroForm">
-                    <label for="cadastro-email">E-mail</label>
-                    <input type="email" id="cadastro-email" placeholder="Digite seu e-mail" required>
-                    <div class="role-selection">
-                    </div>
-                    <button type="submit">Enviar E-mail</button>
-                    <p>Ainda não tem uma conta? <a href="#" data-screen="cadastro">Cadastre-se</a></p>
-                </form>
-            </div>
-        </div>
-    </section>
-
+    <!-- Barra de Navegação -->
+    <nav class="top-nav" id="top-nav">
+        <ul>
+            <li><a href="#" data-screen="dashboard" class="nav-link">Dashboard</a></li>
+            <li><a href="#" data-screen="perfil" class="nav-link">Perfil</a></li>
+            <li><a href="#" data-screen="rota-tempo-real" class="nav-link">Rota em Tempo Real</a></li>
+            <li><a href="#" data-screen="historico-rotas" class="nav-link">Histórico de Rotas</a></li>
+            <li><a href="#" data-screen="chat" class="nav-link">Chat</a></li>
+        </ul>
+        <!-- O botão de tema será inserido aqui via JavaScript -->
+        <button id="logout-btn" class="logout-button">Sair</button>
+    </nav>
+    
     <script src="script.js"></script>
 </body>
 </html>
