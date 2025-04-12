@@ -17,25 +17,32 @@
                     <div class="card-body text-center p-5">
                         <img src="img/perfil.png" class="rounded-circle mb-3" width="100" alt="Avatar">
                         <h2 class="mb-4">Cadastro</h2>
-                        <form id="cadastroForm">
+                        <form id="cadastroForm" novalidate>
                             <div class="mb-3">
-                                <label for="cadastro-email" class="form-label">E-mail</label>
+                                <label for="cadastro-email" class="form-label">E-mail <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="cadastro-email" placeholder="Digite seu e-mail" required>
+                                <div class="invalid-feedback">
+                                    Digite um e-mail válido.
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="cadastro-senha" class="form-label">Senha</label>
+                                <label for="cadastro-senha" class="form-label">Senha <span class="text-danger">*</span></label>
                                 <input type="password" class="form-control" id="cadastro-senha" placeholder="Digite sua senha" required>
+                                <!-- Div para feedback de força da senha -->
+                                <div id="senha-feedback" class="senha-feedback"></div>
                             </div>
                             <div class="mb-3">
-                                <label for="cadastro-confirma-senha" class="form-label">Confirmar Senha</label>
+                                <label for="cadastro-confirma-senha" class="form-label">Confirmar Senha <span class="text-danger">*</span></label>
                                 <input type="password" class="form-control" id="cadastro-confirma-senha" placeholder="Confirme sua senha" required>
+                                <!-- Div para feedback de coincidência de senhas -->
+                                <div id="confirma-senha-feedback" class="confirma-senha-feedback"></div>
                             </div>
                             <div class="mb-4">
-                                <label class="form-label">Escolha seu papel:</label>
+                                <label class="form-label">Escolha seu papel: <span class="text-danger">*</span></label>
                                 <div class="btn-group w-100" role="group">
-                                    <input type="radio" class="btn-check" name="role" id="role-responsavel" checked>
+                                    <input type="radio" class="btn-check" name="role" id="role-responsavel" checked required>
                                     <label class="btn btn-outline-primary" for="role-responsavel">Responsável</label>
-                                    <input type="radio" class="btn-check" name="role" id="role-motorista">
+                                    <input type="radio" class="btn-check" name="role" id="role-motorista" required>
                                     <label class="btn btn-outline-primary" for="role-motorista">Motorista</label>
                                 </div>
                             </div>
