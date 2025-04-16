@@ -403,3 +403,42 @@ document.addEventListener('DOMContentLoaded', function() {
       }
   }
 });
+
+// Função para fazer logout
+function logout() {
+  // Remover informações do usuário da sessão
+  sessionStorage.removeItem('usuarioLogado');
+  
+  // Limpar quaisquer outros dados de autenticação
+  localStorage.removeItem('authToken');
+  sessionStorage.removeItem('userData');
+  
+  // Redirecionar para a página de login
+  window.location.replace('index.html');
+}
+
+// Inicialização do botão de logout
+document.addEventListener('DOMContentLoaded', function() {
+  // Seleciona o botão de logout pelo seu ID
+  const logoutBtn = document.getElementById('logout-btn');
+  
+  // Verifica se o botão existe na página atual
+  if (logoutBtn) {
+    // Remove todos os event listeners existentes (solução mais radical)
+    const newLogoutBtn = logoutBtn.cloneNode(true);
+    logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+    
+    // Adiciona um novo event listener
+    newLogoutBtn.addEventListener('click', function(event) {
+      // Previne comportamento padrão
+      event.preventDefault();
+      
+      // Chama a função de logout
+      logout();
+      
+      // Impede propagação do evento
+      event.stopPropagation();
+      return false;
+    });
+  }
+});
