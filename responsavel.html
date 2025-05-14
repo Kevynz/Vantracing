@@ -17,18 +17,18 @@
                     <div class="card-body text-center p-5">
                         <img src="img/perfil.png" class="rounded-circle mb-3" width="100" alt="Avatar">
                         <h2 class="mb-4">Responsável</h2>
-                        <form id="cadastroForm-responsavel" novalidate>
+                        <form id="cadastroForm" novalidate>
+                            <div class="mb-3">
+                                <label for="cadastro-nome" class="form-label">Nome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-nome" placeholder="Digite seu nome" required>
+                                <div class="invalid-feedback">
+                                </div>
                             <div class="mb-3">
                                 <label for="cadastro-email" class="form-label">E-mail <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="cadastro-email" placeholder="Digite seu e-mail" required>
                                 <div class="invalid-feedback">
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="cadastro-nome" class="form-label">Nome <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="cadastro-nome" placeholder="Digite seu nome" required>
-                                <div class="invalid-feedback">
-                                </div>
                             <div class="mb-3">
                                 <label for="cadastro-cpf" class="form-label">CPF <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="cadastro-cpf" placeholder="Digite seu CPF (apenas números)" maxlength="14" required>
