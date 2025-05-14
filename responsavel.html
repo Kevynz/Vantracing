@@ -16,14 +16,34 @@
                 <div class="card shadow">
                     <div class="card-body text-center p-5">
                         <img src="img/perfil.png" class="rounded-circle mb-3" width="100" alt="Avatar">
-                        <h2 class="mb-4">Cadastro</h2>
-                        <form id="cadastroForm" novalidate>
+                        <h2 class="mb-4">Responsável</h2>
+                        <form id="cadastroForm-responsavel" novalidate>
                             <div class="mb-3">
                                 <label for="cadastro-email" class="form-label">E-mail <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="cadastro-email" placeholder="Digite seu e-mail" required>
                                 <div class="invalid-feedback">
-                                    Digite um e-mail válido.
                                 </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-nome" class="form-label">Nome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-nome" placeholder="Digite seu nome" required>
+                                <div class="invalid-feedback">
+                                </div>
+                            <div class="mb-3">
+                                <label for="cadastro-cpf" class="form-label">CPF <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-cpf" placeholder="Digite seu CPF (apenas números)" maxlength="14" required>
+                                <div class="invalid-feedback">
+                                </div>
+                                <!-- Div para feedback de validação do CPF -->
+                                <div id="cpf-feedback" class="cpf-feedback"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-nascimento" class="form-label">Data de Nascimento <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="cadastro-nascimento" required>
+                                <div class="invalid-feedback">
+                                </div>
+                                <!-- Div para feedback de validação da data de nascimento -->
+                                <div id="nascimento-feedback" class="nascimento-feedback"></div>
                             </div>
                             <div class="mb-3">
                                 <label for="cadastro-senha" class="form-label">Senha <span class="text-danger">*</span></label>
@@ -37,17 +57,17 @@
                                 <!-- Div para feedback de coincidência de senhas -->
                                 <div id="confirma-senha-feedback" class="confirma-senha-feedback"></div>
                             </div>
-                            <div class="mb-4">
-                                <label class="form-label">Escolha seu papel: <span class="text-danger">*</span></label>
-                                <div class="btn-group w-100" role="group">
-                                    <input type="radio" class="btn-check" name="role" id="role-responsavel" checked required>
-                                    <label class="btn btn-outline-primary" for="role-responsavel">Responsável</label>
-                                    <input type="radio" class="btn-check" name="role" id="role-motorista" required>
-                                    <label class="btn btn-outline-primary" for="role-motorista">Motorista</label>
+                            <div class="mb-3 d-none">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="role" id="role-responsavel" value="responsavel" checked>
+                                    <label class="form-check-label" for="role-responsavel">
+                                        Responsável
+                                    </label>
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 mb-3">CADASTRAR</button>
                             <p>Já tem uma conta? <a href="index.html">Logar</a></p>
+                            <p>É motorista ? <a href="motorista.html">Cadastro Motorista</a></p>
                         </form>
                     </div>
                 </div>
@@ -64,5 +84,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <!-- Script do tema -->
     <script src="JavaScript.js"></script>
+    <!-- Script para validação de CPF -->
+    <script src="cpf-validator.js"></script>
 </body>
 </html>

@@ -168,30 +168,43 @@ function validarFormulario(e) {
       isValid = false;
       mensagemErro += 'As senhas não coincidem.\n';
   }
-  
-  // Verificar se um papel foi selecionado
-  if (!roleResponsavel && !roleMotorista) {
-      isValid = false;
-      mensagemErro += 'Selecione um papel (Responsável ou Motorista).\n';
-  }
-  
   // Se houver erros, mostrar alerta e impedir o envio
   if (!isValid) {
       alert('Por favor, corrija os seguintes erros:\n' + mensagemErro);
       return false;
   }
+}
+// Atualização da função para salvar usuário incluindo CPF e data de nascimento
+function salvarUsuario(email, senha, role, cpf, dataNascimento) {
+  // Obter usuários já cadastrados
+  const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
   
-  // Determinar o papel selecionado
-  const role = roleResponsavel ? 'responsavel' : 'motorista';
-  
-  // Salvar os dados do usuário
-  if (salvarUsuario(email, senha, role)) {
-      alert('Cadastro realizado com sucesso! Agora você pode fazer login.');
-      
-      // Redirecionar para a página de login
-      window.location.href = 'index.html';
+  // Verificar se o email já está cadastrado
+  const emailExistente = usuarios.some(usuario => usuario.email === email);
+  if (emailExistente) {
+      alert('Este e-mail já está cadastrado. Por favor, use outro e-mail ou faça login.');
+      return false;
   }
   
+  // Verificar se o CPF já está cadastrado
+  const cpfExistente = usuarios.some(usuario => usuario.cpf === cpf);
+  if (cpfExistente) {
+      alert('Este CPF já está cadastrado. Por favor, verifique seus dados ou faça login.');
+      return false;
+  }
+  
+  // Adicionar novo usuário com CPF e data de nascimento
+  usuarios.push({
+      email: email,
+      senha: senha, // Em um sistema real, a senha NUNCA deve ser armazenada em texto simples
+      role: role,
+      cpf: cpf,
+      dataNascimento: dataNascimento,
+      dataCadastro: new Date().toISOString() // Adiciona a data de cadastro para referência
+  });
+  
+  // Salvar no localStorage
+  localStorage.setItem('usuarios', JSON.stringify(usuarios));
   return true;
 }
 
@@ -442,3 +455,440 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// Funções de validação de CPF
+function validarCPF(cpf) {
+  // Remove caracteres não numéricos
+  cpf = cpf.replace(/[^\d]/g, '');
+  
+  // Verifica se tem 11 dígitos
+  if (cpf.length !== 11) {
+      return false;
+  }
+  
+  // Verifica se todos os dígitos são iguais (caso inválido)
+  if (/^(\d)\1{10}$/.test(cpf)) {
+      return false;
+  }
+  
+  // Algoritmo de validação do CPF
+  let soma = 0;
+  let resto;
+  
+  // Primeiro dígito verificador
+  for (let i = 1; i <= 9; i++) {
+      soma = soma + parseInt(cpf.substring(i-1, i)) * (11 - i);
+  }
+  
+  resto = (soma * 10) % 11;
+  if ((resto === 10) || (resto === 11)) {
+      resto = 0;
+  }
+  
+  if (resto !== parseInt(cpf.substring(9, 10))) {
+      return false;
+  }
+  
+  // Segundo dígito verificador
+  soma = 0;
+  for (let i = 1; i <= 10; i++) {
+      soma = soma + parseInt(cpf.substring(i-1, i)) * (12 - i);
+  }
+  
+  resto = (soma * 10) % 11;
+  if ((resto === 10) || (resto === 11)) {
+      resto = 0;
+  }
+  
+  if (resto !== parseInt(cpf.substring(10, 11))) {
+      return false;
+  }
+  
+  return true;
+}
+
+// Função para formatar o CPF automaticamente (###.###.###-##)
+function formatarCPF(cpf) {
+  // Remove caracteres não numéricos
+  cpf = cpf.replace(/\D/g, '');
+  
+  // Limita a 11 dígitos
+  cpf = cpf.substring(0, 11);
+  
+  // Aplica a máscara
+  cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+  cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+  cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  
+  return cpf;
+}
+
+// Função para atualizar o feedback visual do CPF
+function atualizarFeedbackCPF(cpf) {
+  const cpfInput = document.getElementById('cadastro-cpf');
+  const feedback = document.getElementById('cpf-feedback');
+  
+  // Se o campo estiver vazio, limpar feedback
+  if (!cpf) {
+      feedback.innerHTML = '';
+      cpfInput.classList.remove('is-valid', 'is-invalid');
+      return false;
+  }
+  
+  // Valida o CPF
+  const cpfLimpo = cpf.replace(/\D/g, '');
+  const isValid = (cpfLimpo.length === 11) && validarCPF(cpfLimpo);
+  
+  // Atualiza classes e feedback visuais
+  if (isValid) {
+      cpfInput.classList.add('is-valid');
+      cpfInput.classList.remove('is-invalid');
+      feedback.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> CPF válido</span>';
+  } else if (cpfLimpo.length === 11) {
+      cpfInput.classList.add('is-invalid');
+      cpfInput.classList.remove('is-valid');
+      feedback.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> CPF inválido</span>';
+  } else {
+      cpfInput.classList.add('is-invalid');
+      cpfInput.classList.remove('is-valid');
+      feedback.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> CPF incompleto</span>';
+  }
+  
+  return isValid;
+}
+
+// Função para validar a data de nascimento
+function validarDataNascimento(dataNascimento) {
+  const nascimentoInput = document.getElementById('cadastro-nascimento');
+  const feedback = document.getElementById('nascimento-feedback');
+  
+  // Se o campo estiver vazio, limpar feedback
+  if (!dataNascimento) {
+      feedback.innerHTML = '';
+      nascimentoInput.classList.remove('is-valid', 'is-invalid');
+      return false;
+  }
+  
+  // Converte a string para objeto Date
+  const dataNasc = new Date(dataNascimento);
+  const hoje = new Date();
+  
+  // Calcula a idade
+  let idade = hoje.getFullYear() - dataNasc.getFullYear();
+  const mesAtual = hoje.getMonth();
+  const mesNasc = dataNasc.getMonth();
+  
+  // Ajusta a idade se ainda não fez aniversário no ano atual
+  if (mesNasc > mesAtual || (mesNasc === mesAtual && dataNasc.getDate() > hoje.getDate())) {
+      idade--;
+  }
+  
+  // Validações
+  let isValid = true;
+  let mensagem = '';
+  
+  // Verifica se a data está no futuro
+  if (dataNasc > hoje) {
+      isValid = false;
+      mensagem = '<span class="text-danger"><i class="fas fa-times-circle"></i> A data não pode estar no futuro</span>';
+  } 
+  // Verifica se tem pelo menos 18 anos
+  else if (idade < 18) {
+      isValid = false;
+      mensagem = '<span class="text-danger"><i class="fas fa-times-circle"></i> Você precisa ter pelo menos 18 anos</span>';
+  }
+  // Verifica se a idade é razoável (menor que 120 anos)
+  else if (idade > 120) {
+      isValid = false;
+      mensagem = '<span class="text-danger"><i class="fas fa-times-circle"></i> Data de nascimento inválida</span>';
+  }
+  // Data válida
+  else {
+      mensagem = '<span class="text-success"><i class="fas fa-check-circle"></i> Data válida</span>';
+  }
+  
+  // Atualiza classes e feedback visuais
+  if (isValid) {
+      nascimentoInput.classList.add('is-valid');
+      nascimentoInput.classList.remove('is-invalid');
+  } else {
+      nascimentoInput.classList.add('is-invalid');
+      nascimentoInput.classList.remove('is-valid');
+  }
+  
+  feedback.innerHTML = mensagem;
+  return isValid;
+}
+document.addEventListener('DOMContentLoaded', function() {
+  const cpfInput = document.getElementById('cadastro-cpf');
+  const nascimentoInput = document.getElementById('cadastro-nascimento');
+  
+  // Configuração do campo de CPF
+  if (cpfInput) {
+      // Cria elemento de feedback se não existir
+      if (!document.getElementById('cpf-feedback')) {
+          const feedbackDiv = document.createElement('div');
+          feedbackDiv.id = 'cpf-feedback';
+          feedbackDiv.className = 'cpf-feedback mt-1 text-start';
+          cpfInput.parentNode.appendChild(feedbackDiv);
+      }
+      
+      // Evento para formatar o CPF durante a digitação
+      cpfInput.addEventListener('input', function() {
+          // Mantém o cursor na posição correta durante a formatação
+          const cursorPos = this.selectionStart;
+          const valorOriginal = this.value;
+          const valorFormatado = formatarCPF(valorOriginal);
+          
+          // Calcula a diferença entre os comprimentos para ajustar o cursor
+          const diferencaLength = valorFormatado.length - valorOriginal.length;
+          
+          this.value = valorFormatado;
+          
+          // Ajusta a posição do cursor após formatação
+          if (cursorPos + diferencaLength > 0) {
+              this.setSelectionRange(cursorPos + diferencaLength, cursorPos + diferencaLength);
+          }
+          
+          // Atualiza o feedback visual
+          atualizarFeedbackCPF(this.value);
+      });
+      
+      // Evento para validação completa ao perder o foco
+      cpfInput.addEventListener('blur', function() {
+          atualizarFeedbackCPF(this.value);
+      });
+  }
+  
+  // Configuração do campo de Data de Nascimento
+  if (nascimentoInput) {
+      // Cria elemento de feedback se não existir
+      if (!document.getElementById('nascimento-feedback')) {
+          const feedbackDiv = document.createElement('div');
+          feedbackDiv.id = 'nascimento-feedback';
+          feedbackDiv.className = 'nascimento-feedback mt-1 text-start';
+          nascimentoInput.parentNode.appendChild(feedbackDiv);
+      }
+      
+      // Define a data máxima como hoje
+      const hoje = new Date();
+      const anoAtual = hoje.getFullYear();
+      const mesAtual = String(hoje.getMonth() + 1).padStart(2, '0');
+      const diaAtual = String(hoje.getDate()).padStart(2, '0');
+      nascimentoInput.setAttribute('max', `${anoAtual}-${mesAtual}-${diaAtual}`);
+      
+      // Define a data mínima como 120 anos atrás (idade máxima razoável)
+      nascimentoInput.setAttribute('min', `${anoAtual - 120}-${mesAtual}-${diaAtual}`);
+      
+      // Evento para validar a data ao mudar
+      nascimentoInput.addEventListener('change', function() {
+          validarDataNascimento(this.value);
+      });
+      
+      // Evento para validar a data ao perder o foco
+      nascimentoInput.addEventListener('blur', function() {
+          validarDataNascimento(this.value);
+      });
+  }
+
+// Função de validação da CNH (algoritmo do Detran)
+function validarCNH(cnh) {
+  cnh = cnh.replace(/\D/g, '');
+  if (!/^\d{11}$/.test(cnh) || /^(\d)\1+$/.test(cnh)) return false;
+
+  const nums = cnh.split('').map(Number);
+
+  let dsc = 0;
+  let soma = 0;
+  for (let i = 0, j = 9; i < 9; i++, j--) {
+    soma += nums[i] * j;
+  }
+
+  let dv1 = soma % 11;
+  if (dv1 >= 10) {
+    dv1 = 0;
+    dsc = 2;
+  }
+
+  soma = 0;
+  for (let i = 0, j = 1; i < 9; i++, j++) {
+    soma += nums[i] * j;
+  }
+
+  let dv2 = soma % 11;
+  if (dv2 >= 10) dv2 = 0;
+
+  return dv1 === nums[9] && dv2 === nums[10];
+}
+
+// Função para atualizar o feedback visual da CNH
+function atualizarFeedbackCNH(cnh) {
+  const cnhInput = document.getElementById('cadastro-cnh');
+  const feedback = document.getElementById('cnh-feedback');
+
+  if (!cnh) {
+    feedback.innerHTML = '';
+    cnhInput.classList.remove('is-valid', 'is-invalid');
+    return false;
+  }
+
+  const cnhLimpa = cnh.replace(/\D/g, '');
+  const isValid = (cnhLimpa.length === 11) && validarCNH(cnhLimpa);
+
+  if (isValid) {
+    cnhInput.classList.add('is-valid');
+    cnhInput.classList.remove('is-invalid');
+    feedback.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> CNH válida</span>';
+  } else if (cnhLimpa.length === 11) {
+    cnhInput.classList.add('is-invalid');
+    cnhInput.classList.remove('is-valid');
+    feedback.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> CNH inválida</span>';
+  } else {
+    cnhInput.classList.add('is-invalid');
+    cnhInput.classList.remove('is-valid');
+    feedback.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> CNH incompleta</span>';
+  }
+
+  return isValid;
+}
+
+// Ativar a validação automática enquanto digita
+document.getElementById('cadastro-cnh').addEventListener('input', function () {
+  atualizarFeedbackCNH(this.value);
+});
+  
+  // Modificar a função de validação do formulário para incluir o CPF, data de nascimento e cnh
+  // Verifica se o formulário de cadastro existe
+  const formCadastro = document.getElementById('cadastroForm');
+  if (formCadastro) {
+      // Salva a função original de validação se existir
+      const validarFormularioOriginal = window.validarFormulario || function() {};
+      
+      // Substitui a função de validação
+      window.validarFormulario = function(e) {
+          e.preventDefault();
+          
+          const email = document.getElementById('cadastro-email').value;
+          const cpf = document.getElementById('cadastro-cpf').value;
+          const cpfLimpo = cpf.replace(/\D/g, ''); // Remove caracteres não numéricos
+          const cnh = document.getElementById('cadastro-cnh').value;
+          const dataNascimento = document.getElementById('cadastro-nascimento').value;
+          const senha = document.getElementById('cadastro-senha').value;
+          const confirmaSenha = document.getElementById('cadastro-confirma-senha').value;
+          const roleResponsavel = document.getElementById('role-responsavel').checked;
+          
+          // Verificações de validação
+          let isValid = true;
+          let mensagemErro = '';
+          
+          // Verificar se o email está preenchido e é válido
+          if (!email || !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+              isValid = false;
+              mensagemErro += 'Digite um e-mail válido.\n';
+          }
+          
+          // Verificar se o CPF está preenchido e é válido
+          if (!cpf || !validarCPF(cpf)) {
+              isValid = false;
+              mensagemErro += 'Digite um CPF válido.\n';
+          }
+
+          if (!cnh || !validarCNH(cnh)) {
+            isValid = false;
+            mensagemErro += 'Digite uma CNH válida.\n';
+          }
+          
+          // Verificar se a data de nascimento está preenchida e é válida
+          if (!dataNascimento || !validarDataNascimento(dataNascimento)) {
+              isValid = false;
+              mensagemErro += 'Informe uma data de nascimento válida (mínimo 18 anos).\n';
+          }
+          
+          // Verificar força da senha
+          const forcaSenha = verificarForcaSenha(senha);
+          if (forcaSenha.nivel === 'muito-fraca' || forcaSenha.nivel === 'fraca' || forcaSenha.nivel === 'media') {
+              isValid = false;
+              mensagemErro += 'A senha precisa ser pelo menos BOA (8+ caracteres com letras maiúsculas, minúsculas, números e símbolos).\n';
+          }
+          
+          // Verificar se as senhas coincidem
+          if (senha !== confirmaSenha) {
+              isValid = false;
+              mensagemErro += 'As senhas não coincidem.\n';
+          }
+          
+          // Se houver erros, mostrar alerta e impedir o envio
+          if (!isValid) {
+              alert('Por favor, corrija os seguintes erros:\n' + mensagemErro);
+              return false;
+          }
+          
+          // Salvar os dados do usuário
+          const role = roleResponsavel ? 'responsavel' : 'motorista';
+          if (salvarUsuario(email, senha, role, cpf, dataNascimento, new Date().toISOString())) {
+              // Se o cadastro for bem-sucedido, mostrar mensagem de sucesso
+              alert('Cadastro realizado com sucesso! Agora você pode fazer login.');
+              
+              // Redirecionar para a página de login
+              window.location.href = 'index.html';
+          }
+          
+          return false;
+      };
+      
+      // Atualizar o handler do formulário
+      formCadastro.addEventListener('submit', window.validarFormulario);
+  }
+});
+
+// Função para verificar se o usuário está logado
+function verificarUsuarioLogado() {
+  const usuarioLogado = sessionStorage.getItem('usuarioLogado');
+  
+  if (usuarioLogado) {
+      // Se o usuário já estiver logado, redirecionar para o dashboard
+      window.location.href = 'dashboard.html';
+  }
+}
+// Função para verificar se o usuário tem permissão para acessar a página
+function verificarPermissao() {
+  const usuarioLogado = sessionStorage.getItem('usuarioLogado');
+  
+  if (!usuarioLogado) {
+      // Se não estiver logado, redirecionar para a página de login
+      window.location.href = 'index.html';
+      return false;
+  }
+  
+  const usuario = JSON.parse(usuarioLogado);
+  
+  // Verifica se o usuário tem permissão para acessar a página
+  if (usuario.role !== 'responsavel') {
+      alert('Você não tem permissão para acessar esta página.');
+      window.location.href = 'dashboard.html';
+      return false;
+  }
+  
+  return true;
+}
+// Função para verificar se o usuário tem permissão para acessar a página
+function verificarPermissaoMotorista() {
+  const usuarioLogado = sessionStorage.getItem('usuarioLogado');
+  
+  if (!usuarioLogado) {
+      // Se não estiver logado, redirecionar para a página de login
+      window.location.href = 'index.html';
+      return false;
+  }
+  
+  const usuario = JSON.parse(usuarioLogado);
+  
+  // Verifica se o usuário tem permissão para acessar a página
+  if (usuario.role !== 'motorista') {
+      alert('Você não tem permissão para acessar esta página.');
+      window.location.href = 'dashboard.html';
+      return false;
+  }
+  
+  return true;
+}
