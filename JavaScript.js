@@ -136,108 +136,6 @@ function atualizarIndicadorForca(senha) {
   return forcaSenha.nivel === 'boa' || forcaSenha.nivel === 'forte' || forcaSenha.nivel === 'muito-forte';
 }
 
-// Função para validar o formulário de cadastro
-function validarFormulario(e) {
-  e.preventDefault();
-  
-  const email = document.getElementById('cadastro-email').value;
-  const senha = document.getElementById('cadastro-senha').value;
-  const confirmaSenha = document.getElementById('cadastro-confirma-senha').value;
-  const roleResponsavel = document.getElementById('role-responsavel').checked;
-  const roleMotorista = document.getElementById('role-motorista').checked;
-  
-  // Verificações de validação
-  let isValid = true;
-  let mensagemErro = '';
-  
-  // Verificar se o email está preenchido e é válido
-  if (!email || !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-      isValid = false;
-      mensagemErro += 'Digite um e-mail válido.\n';
-  }
-  
-  // Verificar força da senha
-  const forcaSenha = verificarForcaSenha(senha);
-  if (forcaSenha.nivel === 'muito-fraca' || forcaSenha.nivel === 'fraca' || forcaSenha.nivel === 'media') {
-      isValid = false;
-      mensagemErro += 'A senha precisa ser pelo menos BOA (8+ caracteres com letras maiúsculas, minúsculas, números e símbolos).\n';
-  }
-  
-  // Verificar se as senhas coincidem
-  if (senha !== confirmaSenha) {
-      isValid = false;
-      mensagemErro += 'As senhas não coincidem.\n';
-  }
-  // Se houver erros, mostrar alerta e impedir o envio
-  if (!isValid) {
-      alert('Por favor, corrija os seguintes erros:\n' + mensagemErro);
-      return false;
-  }
-}
-// Atualização da função para salvar usuário incluindo CPF e data de nascimento
-function salvarUsuario(email, senha, role, cpf, dataNascimento) {
-  // Obter usuários já cadastrados
-  const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-  
-  // Verificar se o email já está cadastrado
-  const emailExistente = usuarios.some(usuario => usuario.email === email);
-  if (emailExistente) {
-      alert('Este e-mail já está cadastrado. Por favor, use outro e-mail ou faça login.');
-      return false;
-  }
-  
-  // Verificar se o CPF já está cadastrado
-  const cpfExistente = usuarios.some(usuario => usuario.cpf === cpf);
-  if (cpfExistente) {
-      alert('Este CPF já está cadastrado. Por favor, verifique seus dados ou faça login.');
-      return false;
-  }
-  
-  // Adicionar novo usuário com CPF e data de nascimento
-  usuarios.push({
-      email: email,
-      senha: senha, // Em um sistema real, a senha NUNCA deve ser armazenada em texto simples
-      role: role,
-      cpf: cpf,
-      dataNascimento: dataNascimento,
-      dataCadastro: new Date().toISOString() // Adiciona a data de cadastro para referência
-  });
-  
-  // Salvar no localStorage
-  localStorage.setItem('usuarios', JSON.stringify(usuarios));
-  return true;
-}
-
-// Funções para autenticação
-function verificarLogin(email, senha) {
-  // Obter usuários cadastrados
-  const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-  
-  // Procurar por um usuário com o email e senha fornecidos
-  const usuario = usuarios.find(user => user.email === email && user.senha === senha);
-  
-  if (usuario) {
-      // Se encontrou o usuário, armazenar informações na sessão atual
-      sessionStorage.setItem('usuarioLogado', JSON.stringify({
-          email: usuario.email,
-          role: usuario.role
-      }));
-      return true;
-  }
-  
-  return false;
-}
-
-// Verificar se o usuário já está logado
-function verificarUsuarioLogado() {
-  const usuarioLogado = sessionStorage.getItem('usuarioLogado');
-  
-  if (usuarioLogado) {
-      // Se o usuário já estiver logado, redirecionar para o dashboard
-      window.location.href = 'dashboard.html';
-  }
-}
-
 // Função para lidar com a submissão do formulário de login
 function handleLoginSubmit(e) {
   e.preventDefault();
@@ -776,6 +674,7 @@ document.getElementById('cadastro-cnh').addEventListener('input', function () {
           const senha = document.getElementById('cadastro-senha').value;
           const confirmaSenha = document.getElementById('cadastro-confirma-senha').value;
           const roleResponsavel = document.getElementById('role-responsavel').checked;
+          const roleMotorista = document.getElementById('role-motorista').checked;
           
           // Verificações de validação
           let isValid = true;
@@ -859,36 +758,4 @@ function verificarPermissao() {
       window.location.href = 'index.html';
       return false;
   }
-  
-  const usuario = JSON.parse(usuarioLogado);
-  
-  // Verifica se o usuário tem permissão para acessar a página
-  if (usuario.role !== 'responsavel') {
-      alert('Você não tem permissão para acessar esta página.');
-      window.location.href = 'dashboard.html';
-      return false;
-  }
-  
-  return true;
-}
-// Função para verificar se o usuário tem permissão para acessar a página
-function verificarPermissaoMotorista() {
-  const usuarioLogado = sessionStorage.getItem('usuarioLogado');
-  
-  if (!usuarioLogado) {
-      // Se não estiver logado, redirecionar para a página de login
-      window.location.href = 'index.html';
-      return false;
-  }
-  
-  const usuario = JSON.parse(usuarioLogado);
-  
-  // Verifica se o usuário tem permissão para acessar a página
-  if (usuario.role !== 'motorista') {
-      alert('Você não tem permissão para acessar esta página.');
-      window.location.href = 'dashboard.html';
-      return false;
-  }
-  
-  return true;
 }
