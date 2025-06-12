@@ -161,7 +161,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <!-- Script do tema -->
     <script src="JavaScript/geral.js"></script>
-    <script src="JavaScript/perfil.js"></script>
     <script>
         // Script para alternar entre as seções do perfil
         document.querySelectorAll('.list-group-item').forEach(item => {
@@ -176,6 +175,101 @@
                 // Ocultar todas as seções e mostrar a selecionada
                 document.querySelectorAll('.profile-section').forEach(section => section.classList.remove('active'));
                 document.getElementById(sectionId).classList.add('active');
+            });
+        });
+
+         // Função para carregar os dados do perfil do usuário
+        async function carregarPerfil() {
+            // 1. Pega os dados do usuário que foram salvos no sessionStorage durante o login
+            const usuarioLogado = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+
+            // 2. Se não houver usuário logado, redireciona para a página de login
+            if (!usuarioLogado || !usuarioLogado.id) {
+                alert('Você precisa estar logado para acessar esta página.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // 3. Busca os dados mais recentes do perfil no banco de dados
+            try {
+                const response = await fetch(`api/get_perfil.php?id=${usuarioLogado.id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const user = data.user;
+                    // 4. Preenche os campos do formulário com os dados recebidos
+                    document.getElementById('user-nome').textContent = user.nome; // Nome no card lateral
+                    document.getElementById('nome').value = user.nome; // Campo 'Nome' no formulário
+                    document.getElementById('seguranca-email').value = user.email; // Campo 'E-mail' na aba de segurança
+                    // Preencha outros campos aqui, se existirem no seu formulário
+                    // Ex: document.getElementById('profissao').value = user.profissao;
+                } else {
+                    alert(data.msg);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar perfil:', error);
+                alert('Não foi possível carregar os dados do perfil.');
+            }
+        }
+
+        // Função para salvar os dados do perfil
+        async function salvarPerfil(event) {
+            event.preventDefault(); // Impede o recarregamento da página
+
+            const usuarioLogado = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+            const nomeInput = document.getElementById('nome').value;
+
+            const formData = new FormData();
+            formData.append('id', usuarioLogado.id);
+            formData.append('nome', nomeInput);
+            // Adicione outros campos aqui
+            // Ex: formData.append('profissao', document.getElementById('profissao').value);
+
+            try {
+                const response = await fetch('api/update_perfil.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                alert(data.msg); // Exibe a mensagem de sucesso ou erro
+
+                if (data.success) {
+                    // Atualiza o nome no sessionStorage se a alteração foi bem-sucedida
+                    usuarioLogado.nome = nomeInput;
+                    sessionStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+                    carregarPerfil(); // Recarrega os dados na tela
+                }
+            } catch (error) {
+                console.error('Erro ao salvar perfil:', error);
+                alert('Não foi possível salvar os dados do perfil.');
+            }
+        }
+
+        // --- Lógica de Inicialização e Event Listeners ---
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carrega os dados do perfil assim que a página é aberta
+            carregarPerfil();
+
+            // Adiciona o listener para o formulário de salvar perfil
+            const perfilForm = document.getElementById('perfilForm');
+            if (perfilForm) {
+                perfilForm.addEventListener('submit', salvarPerfil);
+            }
+
+            // Lógica original para alternar entre as abas do perfil
+            document.querySelectorAll('.list-group-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('data-section');
+                    
+                    document.querySelectorAll('.list-group-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    document.querySelectorAll('.profile-section').forEach(section => section.classList.remove('active'));
+                    document.getElementById(sectionId).classList.add('active');
+                });
             });
         });
     </script>
