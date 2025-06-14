@@ -1,47 +1,29 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VanTracing</title>
-    <!-- Bootstrap CSS -->
+    <title>VanTracing - Perfil do Motorista</title>
+    <!-- Links CSS e Ícones -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilo.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <style>
-        .profile-section {
-            display: none;
-        }
-        .profile-section.active {
-            display: block;
-        }
+        .profile-section { display: none; }
+        .profile-section.active { display: block; }
     </style>
 </head>
 <body>
-    <!-- Barra de Navegação Principal -->
+    <!-- Barra de Navegação -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="dashboard.html">VanTracing</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <a class="navbar-brand" href="./dashboard.html">VanTracing</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard.html">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="perfil.html">Perfil</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="rota-tempo-real.html">Rota em Tempo Real</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="historico-rotas.html">Histórico de Rotas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="chat.html">Chat</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="./dashboard.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="./perfil.html">Perfil</a></li>
                 </ul>
                 <button id="logout-btn" class="btn btn-outline-light">Sair</button>
             </div>
@@ -53,99 +35,81 @@
             <div class="col-md-3">
                 <div class="card mb-4">
                     <div class="card-body text-center">
-                        <img src="img/perfil.png" class="rounded-circle mb-3" width="150" alt="Foto">
-                        <h4 id="user-nome">Nome e Sobrenome</h4>
+                        <h4 id="user-nome-display">Carregando...</h4>
                     </div>
                 </div>
                 <div class="list-group mb-4">
-                    <a href="#" data-section="perfil-info" class="list-group-item list-group-item-action active">Perfil</a>
-                    <a href="#" data-section="perfil-foto" class="list-group-item list-group-item-action">Foto</a>
-                    <a href="#" data-section="perfil-seguranca" class="list-group-item list-group-item-action">Segurança da conta</a>
+                    <a href="#" data-section="info-section" class="list-group-item list-group-item-action active">Minhas Informações</a>
+                    <a href="#" data-section="seguranca-section" class="list-group-item list-group-item-action">Segurança</a>
                 </div>
             </div>
             <div class="col-md-9">
-                <div id="perfil-info" class="profile-section active">
+                <!-- Seção de Informações do Motorista -->
+                <div id="info-section" class="profile-section active">
                     <div class="card">
-                        <div class="card-header">
-                            <h4 class="mb-0">Perfil Público</h4>
-                        </div>
+                        <div class="card-header"><h4 class="mb-0">Dados do Motorista</h4></div>
                         <div class="card-body">
-                            <p class="card-text">Adicione informações sobre você</p>
-                            <form id="perfilForm">
+                            <form>
                                 <div class="mb-3">
-                                    <label for="nome" class="form-label">Nome</label>
-                                    <input type="text" class="form-control" id="nome" placeholder="Digite seu nome">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="profissao" class="form-label">Profissão ou Título</label>
-                                    <input type="text" class="form-control" id="profissao" placeholder="Digite seu título profissional">
-                                </div>
-                                 <div class="mb-3">
-                                    <label for="site" class="form-label">CNH</label>
-                                    <input type="url" class="form-control" id="site" placeholder="Digite sua CNH">
+                                    <label for="motorista-cpf" class="form-label">CPF</label>
+                                    <input type="text" id="motorista-cpf" class="form-control" readonly disabled>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="bio" class="form-label">Bio</label>
-                                    <textarea class="form-control" id="bio" rows="3" placeholder="Digite sua bio"></textarea>
+                                    <label for="motorista-cnh" class="form-label">CNH</label>
+                                    <input type="text" id="motorista-cnh" class="form-control" readonly disabled>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="idioma" class="form-label">Idioma</label>
-                                    <select class="form-select" id="idioma">
-                                        <option value="pt-br">Português (Brasil)</option>
-                                        <option value="en">Inglês</option>
-                                        <option value="es">Espanhol</option>
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Salvar</button>
+                                <small class="form-text text-muted">Para alterar estes dados, por favor, entre em contato com o suporte.</small>
                             </form>
                         </div>
                     </div>
                 </div>
-                <div id="perfil-foto" class="profile-section">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="mb-0">Foto do Perfil</h4>
-                        </div>
-                        <div class="card-body text-center">
-                            <p class="card-text">Atualize sua foto de perfil</p>
-                            <div class="photo-preview mb-3">
-                                <img src="img/perfil.png" id="photo-preview-img" class="img-thumbnail" alt="Prévia da Foto" style="max-width: 200px;">
+
+                <!-- Seção de Segurança -->
+                <div id="seguranca-section" class="profile-section">
+                     <div class="card">
+                        <div class="card-header"><h4 class="mb-0">Segurança da Conta</h4></div>
+                        <div class="card-body">
+                            <!-- Formulário para Alterar Nome e E-mail -->
+                            <form id="updateInfoForm" class="mb-5">
+                                <h5>Alterar Informações</h5>
+                                <div class="mb-3">
+                                    <label for="new-name" class="form-label">Nome Completo</label>
+                                    <input type="text" class="form-control" id="new-name" placeholder="Seu nome completo">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-email" class="form-label">E-mail</label>
+                                    <input type="email" class="form-control" id="new-email" placeholder="Seu novo e-mail">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="info-current-password" class="form-label">Senha Atual (para confirmar)</label>
+                                    <input type="password" class="form-control" id="info-current-password" required placeholder="Digite sua senha atual">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Salvar Informações</button>
+                            </form>
+                            <hr>
+                            <!-- Formulário para Alterar Senha -->
+                            <form id="updatePasswordForm" class="mb-5">
+                                <h5>Alterar Senha</h5>
+                                <div class="mb-3">
+                                    <label for="pass-current-password" class="form-label">Senha Atual</label>
+                                    <input type="password" class="form-control" id="pass-current-password" required placeholder="Digite sua senha atual">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-password" class="form-label">Nova Senha</label>
+                                    <input type="password" class="form-control" id="new-password" required placeholder="Mínimo 8 caracteres">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirm-new-password" class="form-label">Confirmar Nova Senha</label>
+                                    <input type="password" class="form-control" id="confirm-new-password" required placeholder="Repita a nova senha">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                            </form>
+                            <hr>
+                            <!-- Zona de Perigo -->
+                            <div class="p-3 border border-danger rounded">
+                                <p>A exclusão da sua conta é uma ação irreversível e removerá todos os seus dados.</p>
+                                <button id="delete-account-btn" class="btn btn-danger">Excluir Minha Conta</button>
                             </div>
-                            <form id="fotoForm">
-                                <div class="mb-3">
-                                    <input type="file" class="form-control" id="foto-upload" accept="image/*">
-                                </div>
-                                <button type="submit" class="btn btn-primary">Salvar Foto</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div id="perfil-seguranca" class="profile-section">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="mb-0">Segurança da Conta</h4>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">Gerencie suas configurações de segurança</p>
-                            <form id="segurancaForm">
-                                <div class="mb-3">
-                                    <label for="seguranca-email" class="form-label">E-mail Atual</label>
-                                    <input type="email" class="form-control" id="seguranca-email" placeholder="Seu e-mail atual" readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="seguranca-senha-atual" class="form-label">Senha Atual</label>
-                                    <input type="password" class="form-control" id="seguranca-senha-atual" placeholder="Digite sua senha atual">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="seguranca-senha-nova" class="form-label">Nova Senha</label>
-                                    <input type="password" class="form-control" id="seguranca-senha-nova" placeholder="Digite sua nova senha">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="seguranca-confirma-senha" class="form-label">Confirmar Nova Senha</label>
-                                    <input type="password" class="form-control" id="seguranca-confirma-senha" placeholder="Confirme sua nova senha">
-                                </div>
-                                <button type="submit" class="btn btn-primary">Atualizar Senha</button>
-                            </form>
                         </div>
                     </div>
                 </div>
@@ -153,31 +117,9 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle com Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Estilos do tema -->
-    <link rel="stylesheet" href="Estilo.css">
-    <!-- Ícones do Material Design (necessários para o botão de troca de tema) -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <!-- Script do tema -->
     <script src="JavaScript/geral.js"></script>
-    <script src="JavaScript/perfil.js"></script>
-    <script>
-        // Script para alternar entre as seções do perfil
-        document.querySelectorAll('.list-group-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const sectionId = this.getAttribute('data-section');
-                
-                // Remover classe active de todos os itens e adicionar ao clicado
-                document.querySelectorAll('.list-group-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Ocultar todas as seções e mostrar a selecionada
-                document.querySelectorAll('.profile-section').forEach(section => section.classList.remove('active'));
-                document.getElementById(sectionId).classList.add('active');
-            });
-        });
-    </script>
+    <!-- Script específico para esta página -->
+    <script src="JavaScript/perfil-motorista.js"></script>
 </body>
 </html>

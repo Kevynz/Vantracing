@@ -5,15 +5,53 @@ CREATE TABLE usuarios (
     id INT(11) PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    cpf VARCHAR(14) NOT NULL UNIQUE,
-    cnh VARCHAR(11),
-    data_nascimento DATE NOT NULL,
     senha VARCHAR(255) NOT NULL,
     role ENUM('responsavel', 'motorista') NOT NULL,
     data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE `motoristas` (
+  `id` INT(11) PRIMARY KEY AUTO_INCREMENT,
+  `usuario_id` INT(11) NOT NULL,
+  `cpf` VARCHAR(14) NOT NULL UNIQUE,
+  `cnh` VARCHAR(11) NOT NULL UNIQUE,
+  `data_nascimento` DATE NOT NULL,
+  CONSTRAINT `fk_motorista_usuario`
+    FOREIGN KEY (`usuario_id`)
+    REFERENCES `usuarios`(`id`)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE `responsaveis` (
+  `id` INT(11) PRIMARY KEY AUTO_INCREMENT,
+  `usuario_id` INT(11) NOT NULL,
+  `cpf` VARCHAR(14) NOT NULL UNIQUE,
+  `data_nascimento` DATE NOT NULL,
+  CONSTRAINT `fk_responsavel_usuario`
+    FOREIGN KEY (`usuario_id`)
+    REFERENCES `usuarios`(`id`)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE `criancas` (
+  `id` INT(11) PRIMARY KEY AUTO_INCREMENT,
+  `nome` VARCHAR(100) NOT NULL,
+  `data_nascimento` DATE NOT NULL,
+  `escola` VARCHAR(255) NULL,
+  `observacoes` TEXT NULL,
+  `usuario_id` INT(11) NOT NULL,
+  CONSTRAINT `fk_crianca_responsavel`
+    FOREIGN KEY (`usuario_id`)
+    REFERENCES `usuarios`(`id`)
+    ON DELETE CASCADE
+);
+
 SHOW DATABASES;
 SHOW TABLES;
 DESCRIBE usuarios;
-SELECT id, nome, email, role FROM usuarios;
+DESCRIBE criancas;
+SELECT id, nome, email, senha, role, data_cadastro FROM usuarios;
+SELECT id, nome, data_nascimento, escola, usuario_id role FROM criancas;
+
+
+

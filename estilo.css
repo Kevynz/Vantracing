@@ -103,6 +103,11 @@
   .card-header {
     background-color: rgba(0, 0, 0, 0.05);
     border-bottom-color: var(--border-color);
+    color: var(--text-main);
+  }
+  
+  .form-text.text-muted {
+    color: var(--text-muted);
   }
   
   .card-body {
@@ -122,6 +127,27 @@
     border-color: var(--primary-color);
     box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
   }
+
+  /*Estilos específicos para formulários no tema escuro */
+    body.dark-theme .form-control,
+    body.dark-theme .form-select {
+        color: #f8f9fa; /* Garante que o texto seja branco */
+        background-color: #2d2d2d;
+    }
+
+    body.dark-theme .form-control::placeholder { /* Para placeholders */
+        color: #6c757d;
+        opacity: 1;
+    }
+
+    body.dark-theme .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f8f9fa' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    }
+
+  /* Garante que o texto de ajuda (muted) fique claro no tema escuro */
+    body.dark-theme .text-muted {
+        color: var(--text-muted) !important;
+    }
   
   /* Botões */
   .btn-primary {
@@ -313,4 +339,27 @@ label .text-danger {
 /* Estilização específica para o campo de data */
 input[type="date"].form-control {
   padding-right: 2rem; /* Espaço suficiente para o ícone de validação */
+}
+
+/* ==== ALTERNADOR DE TEMA ==== */
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+  
+.theme-toggle:hover {
+    transform: scale(1.1);
 }

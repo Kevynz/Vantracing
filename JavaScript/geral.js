@@ -474,14 +474,13 @@ function atualizarFeedbackCNH(cnh) {
 async function validarFormularioCadastro(e) {
     e.preventDefault();
 
-    // --- LÓGICA DE PERFIL CORRIGIDA ---
+    // --- LÓGICA DE PERFIL ---
     // Define um perfil padrão e só muda se encontrar o campo do responsável
     let role = 'motorista'; 
     const radioResponsavel = document.getElementById('role-responsavel');
     if (radioResponsavel && radioResponsavel.checked) {
         role = 'responsavel';
     }
-    // --- FIM DA CORREÇÃO ---
 
     // Obter valores dos campos
     const nome = document.getElementById('cadastro-nome').value;

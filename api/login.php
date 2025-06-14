@@ -1,45 +1,73 @@
 <?php
-// api/login.php
+// ARQUIVO: api/login.php
+
 require 'db_connect.php';
 header('Content-Type: application/json');
+
+// Função para enviar respostas JSON e terminar o script.
+function send_json_response($success, $data) {
+    ob_end_clean(); // Limpa qualquer output indesejado
+    $data['success'] = $success;
+    echo json_encode($data);
+    exit();
+}
+
+ob_start(); // Inicia o buffer de saída
 
 $email = $_POST['email'] ?? '';
 $senha = $_POST['senha'] ?? '';
 
 if (empty($email) || empty($senha)) {
-    echo json_encode(['success' => false, 'msg' => 'E-mail e senha são obrigatórios.']);
-    exit();
+    send_json_response(false, ['msg' => 'E-mail e senha são obrigatórios.']);
 }
 
-// --- SEGURANÇA: Prepara a query para evitar SQL Injection ---
+// Procura o utilizador na tabela principal 'usuarios'
 $sql = "SELECT id, nome, email, role, senha FROM usuarios WHERE email = ?";
 $stmt = $conn->prepare($sql);
+if(!$stmt) {
+    send_json_response(false, ['msg' => 'Erro ao preparar a query de usuário.']);
+}
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if ($result->num_rows === 1) {
-    $user = $result->fetch_assoc();
+if ($result->num_rows !== 1) {
+    send_json_response(false, ['msg' => 'Credenciais inválidas.']);
+}
 
-    // --- SEGURANÇA: Verifica a senha criptografada ---
-    if (password_verify($senha, $user['senha'])) {
-        // Senha correta!
-        // Remove a senha do array antes de enviar de volta para o front-end
-        unset($user['senha']);
+$user = $result->fetch_assoc();
 
-        echo json_encode([
-            'success' => true,
-            'user' => $user
-        ]);
-    } else {
-        // Senha incorreta
-        echo json_encode(['success' => false, 'msg' => 'Credenciais inválidas.']);
+// Verifica a senha
+if (!password_verify($senha, $user['senha'])) {
+    send_json_response(false, ['msg' => 'Credenciais inválidas.']);
+}
+
+// Remove a senha do array antes de continuar
+unset($user['senha']);
+
+// Busca os dados do perfil específico (motorista ou responsável)
+$profile_sql = "";
+if ($user['role'] === 'responsavel') {
+    $profile_sql = "SELECT cpf, data_nascimento FROM responsaveis WHERE usuario_id = ?";
+} elseif ($user['role'] === 'motorista') {
+    $profile_sql = "SELECT cpf, data_nascimento, cnh FROM motoristas WHERE usuario_id = ?";
+}
+
+if (!empty($profile_sql)) {
+    $stmt_profile = $conn->prepare($profile_sql);
+    $stmt_profile->bind_param("i", $user['id']);
+    $stmt_profile->execute();
+    $profile_result = $stmt_profile->get_result();
+    if ($profile_result->num_rows === 1) {
+        // Adiciona os dados do perfil ao objeto do utilizador
+        $user['profile'] = $profile_result->fetch_assoc();
     }
-} else {
-    // Usuário não encontrado
-    echo json_encode(['success' => false, 'msg' => 'Credenciais inválidas.']);
+    $stmt_profile->close();
 }
 
 $stmt->close();
 $conn->close();
+
+// Envia a resposta final com todos os dados do utilizador e do seu perfil
+send_json_response(true, ['user' => $user]);
 ?>
