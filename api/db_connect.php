@@ -1,10 +1,8 @@
 <?php
-// api/db_connect.php
-
 // Configurações do banco de dados
 $servername = "localhost";
-$username = "root"; // Padrão do XAMPP
-$password = "3545";     // Padrão do XAMPP
+$username = "root";
+$password = "3545";
 $dbname = "vantracing_db";
 
 // Cria a conexão
