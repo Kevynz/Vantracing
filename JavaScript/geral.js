@@ -672,3 +672,124 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// --- INÍCIO DO CÓDIGO DE RESET DE SENHA ---
+
+// Adiciona um "ouvinte" que espera o documento HTML inteiro ser carregado antes de executar o código dentro dele.
+// Isso evita erros de tentar manipular elementos que ainda não existem na página.
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- Lógica para a página reset-senha.html ---
+    
+    // Procura na página por um elemento com o id 'resetSenhaForm'.
+    const resetSenhaForm = document.getElementById('resetSenhaForm');
+    
+    // Se encontrar o formulário (ou seja, se estivermos na página reset-senha.html)...
+    if (resetSenhaForm) {
+        // ...adiciona um "ouvinte" para o evento 'submit' (quando o botão 'type="submit"' é clicado).
+        // A função 'async' permite o uso do 'await' para esperar respostas da API.
+        resetSenhaForm.addEventListener('submit', async function(e) {
+            // Previne o comportamento padrão do formulário, que é recarregar a página.
+            e.preventDefault();
+            
+            // Pega os valores digitados pelo usuário.
+            const email = document.getElementById('reset-email').value;
+            const feedbackDiv = document.getElementById('feedback');
+            // Mostra uma mensagem de carregamento para o usuário.
+            feedbackDiv.textContent = 'Enviando...';
+            
+            // Cria um objeto FormData, que é a maneira correta de enviar dados de formulário via fetch.
+            const formData = new FormData();
+            formData.append('email', email);
+
+            try {
+                // Faz a requisição para a API (backend) de forma assíncrona.
+                const response = await fetch('api/request_reset.php', {
+                    method: 'POST', // Método de envio
+                    body: formData  // Os dados a serem enviados
+                });
+                // Espera a resposta do servidor e a converte de JSON para um objeto JavaScript.
+                const result = await response.json();
+
+                // Verifica o campo 'success' da resposta do PHP.
+                if (result.success) {
+                    // Se deu certo, mostra a mensagem de sucesso.
+                    feedbackDiv.innerHTML = `<div class="alert alert-success">${result.msg}</div>`;
+                    
+                    // Mostra o token em um alerta (apenas para testes) e redireciona o usuário.
+                    alert(`PARA TESTES: O código de recuperação é ${result.token_para_teste}`);
+                    window.location.href = `nova-senha.html?email=${encodeURIComponent(email)}`;
+                } else {
+                    // Se deu erro, mostra a mensagem de erro.
+                    feedbackDiv.innerHTML = `<div class="alert alert-danger">${result.msg}</div>`;
+                }
+            } catch (error) {
+                // Se houver um erro de conexão (ex: sem internet), mostra uma mensagem genérica.
+                feedbackDiv.innerHTML = `<div class="alert alert-danger">Erro de conexão. Tente novamente.</div>`;
+            }
+        });
+    }
+
+    // --- Lógica para a página nova-senha.html ---
+    
+    // Procura na página por um elemento com o id 'novaSenhaForm'.
+    const novaSenhaForm = document.getElementById('novaSenhaForm');
+    
+    // Se encontrar o formulário (ou seja, se estivermos na página nova-senha.html)...
+    if (novaSenhaForm) {
+        // ...executa a lógica para essa página.
+        
+        // Pega o e-mail que foi passado como parâmetro na URL.
+        const urlParams = new URLSearchParams(window.location.search);
+        const emailFromUrl = urlParams.get('email');
+        // Se o e-mail existir na URL, preenche o campo oculto do formulário com ele.
+        if (emailFromUrl) {
+            document.getElementById('reset-email-hidden').value = emailFromUrl;
+        }
+
+        // Adiciona o "ouvinte" de 'submit' para o formulário da nova senha.
+        novaSenhaForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Pega todos os valores dos campos do formulário.
+            const email = document.getElementById('reset-email-hidden').value;
+            const token = document.getElementById('reset-code').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const feedbackDiv = document.getElementById('feedback');
+
+            // Validação simples no frontend para senhas que não coincidem.
+            if (newPassword !== confirmPassword) {
+                feedbackDiv.innerHTML = `<div class="alert alert-danger">As senhas não coincidem.</div>`;
+                return; // Para a execução da função.
+            }
+
+            // Prepara os dados para enviar ao backend.
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('token', token);
+            formData.append('new_password', newPassword);
+
+            try {
+                 // Envia os dados para o script que finaliza o processo.
+                 const response = await fetch('api/do_reset.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                // Processa a resposta do servidor.
+                if (result.success) {
+                    alert('Senha redefinida com sucesso! Você será redirecionado para o login.');
+                    // Redireciona para a página de login após o sucesso.
+                    window.location.href = 'index.html';
+                } else {
+                    feedbackDiv.innerHTML = `<div class="alert alert-danger">${result.msg}</div>`;
+                }
+            } catch(error) {
+                 feedbackDiv.innerHTML = `<div class="alert alert-danger">Erro de conexão. Tente novamente.</div>`;
+            }
+        });
+    }
+});
+// --- FIM DO CÓDIGO DE RESET DE SENHA ---

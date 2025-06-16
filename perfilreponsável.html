@@ -16,7 +16,6 @@
     </style>
 </head>
 <body>
-    <!-- Barra de Navegação -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="./dashboard.html">VanTracing</a>
@@ -45,7 +44,6 @@
                 </div>
             </div>
             <div class="col-md-9">
-                <!-- Secção de Gestão de Crianças -->
                 <div id="criancas-section" class="profile-section active">
                     <div class="card mb-4">
                         <div class="card-header"><h4 class="mb-0">Adicionar Nova Criança</h4></div>
@@ -53,23 +51,26 @@
                              <form id="criancaForm">
                                 <div class="mb-3">
                                     <label for="nome-crianca" class="form-label">Nome da Criança</label>
-                                    <input type="text" class="form-control" id="nome-crianca" placeholder="Nome completo da criança" required>
+                                    <input type="text" class="form-control" id="nome-crianca" required>
+                                </div>
+                                <div class="date-selects mb-3">
+                                    <select id="dia-crianca" class="form-select" required>
+                                        <option value="">Dia</option>
+                                    </select>
+                                    <select id="mes-crianca" class="form-select" required>
+                                        <option value="">Mês</option>
+                                    </select>
+                                    <select id="ano-crianca" class="form-select" required>
+                                        <option value="">Ano</option>
+                                    </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Data de Nascimento</label>
-                                    <div class="date-selects">
-                                        <select class="form-select" id="dia-crianca" required><option value="" disabled selected>Dia</option></select>
-                                        <select class="form-select" id="mes-crianca" required><option value="" disabled selected>Mês</option></select>
-                                        <select class="form-select" id="ano-crianca" required><option value="" disabled selected>Ano</option></select>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="escola-crianca" class="form-label">Instituição de Ensino</label>
-                                    <input type="text" class="form-control" id="escola-crianca" placeholder="Ex: Escola ABC">
+                                    <label for="escola-crianca" class="form-label">Escola</label>
+                                    <input type="text" class="form-control" id="escola-crianca">
                                 </div>
                                 <div class="mb-3">
                                     <label for="obs-crianca" class="form-label">Observações</label>
-                                    <textarea class="form-control" id="obs-crianca" rows="3" placeholder="Alergias, cuidados especiais, etc."></textarea>
+                                    <textarea class="form-control" id="obs-crianca"></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Adicionar Criança</button>
                             </form>
@@ -81,12 +82,10 @@
                     </div>
                 </div>
 
-                <!-- Secção de Segurança -->
                 <div id="seguranca-section" class="profile-section">
                      <div class="card">
                         <div class="card-header"><h4 class="mb-0">Segurança da Conta</h4></div>
                         <div class="card-body">
-                            <!-- Formulário para Alterar Nome e E-mail -->
                             <form id="updateInfoForm" class="mb-5">
                                 <h5>Alterar Informações</h5>
                                 <div class="mb-3">
@@ -104,8 +103,7 @@
                                 <button type="submit" class="btn btn-primary">Guardar Informações</button>
                             </form>
                             <hr>
-                            <!-- Formulário para Alterar Senha -->
-                            <form id="updatePasswordForm" class="mb-5">
+                             <form id="updatePasswordForm" class="mb-5">
                                 <h5>Alterar Senha</h5>
                                 <div class="mb-3">
                                     <label for="pass-current-password" class="form-label">Senha Atual</label>
@@ -126,9 +124,7 @@
                                 <p>A exclusão da sua conta é uma ação irreversível.</p>
                                 <button id="delete-account-btn" class="btn btn-danger">Excluir a Minha Conta</button>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </div>**
             </div>
         </div>
     </div>
