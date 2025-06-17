@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // ### CÓDIGO FALTANTE (LÓGICA DAS ABAS) ###
         document.querySelectorAll('.list-group-item[data-section]').forEach(item => {
             item.addEventListener('click', function(e) {
                 e.preventDefault();

@@ -1,45 +1,100 @@
 <?php
-// api/update_perfil.php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 require 'db_connect.php';
+
 header('Content-Type: application/json');
 
-if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'msg' => 'Erro na conexão com o banco de dados: ' . $conn->connect_error]);
+// Função para enviar respostas JSON
+function send_json_response($success, $msg, $data = []) {
+    $response = ['success' => $success, 'msg' => $msg];
+    echo json_encode(array_merge($response, $data));
     exit();
 }
 
-// Pega os dados enviados pelo front-end via POST
-$userId = isset($_POST['id']) ? filter_var($_POST['id'], FILTER_VALIDATE_INT) : 0;
-$nome = isset($_POST['nome']) ? trim($_POST['nome']) : '';
-// Valida se o nome contém apenas letras, espaços e acentos comuns
-if (!preg_match('/^[\p{L}\s\-\'\.]+$/u', $nome)) {
-    echo json_encode(['success' => false, 'msg' => 'Nome inválido.']);
-    exit();
+$userId = $_POST['id'] ?? 0;
+$currentPassword = $_POST['current_password'] ?? '';
+$newName = trim($_POST['new_name'] ?? '');
+$newEmail = trim($_POST['new_email'] ?? '');
+$newPassword = $_POST['new_password'] ?? '';
+
+if ($userId <= 0 || empty($currentPassword)) {
+    send_json_response(false, 'A sua senha atual é necessária para fazer qualquer alteração.');
 }
 
-if ($userId <= 0 || empty($nome)) {
-    echo json_encode(['success' => false, 'msg' => 'Dados inválidos.']);
-    exit();
+// --- 1. Verificar a Senha Atual e buscar dados existentes ---
+$sql_check_pass = "SELECT nome, email, senha FROM usuarios WHERE id = ?";
+$stmt_check = $conn->prepare($sql_check_pass);
+$stmt_check->bind_param('i', $userId);
+$stmt_check->execute();
+$result = $stmt_check->get_result();
+
+if ($result->num_rows !== 1) {
+    send_json_response(false, 'Utilizador não encontrado.');
 }
 
-// Prepara a query para ATUALIZAR o nome do usuário
-// Adicione outros campos aqui conforme necessário (ex: SET nome = ?, profissao = ?, ...)
-$sql = "UPDATE usuarios SET nome = ? WHERE id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("si", $nome, $userId); // "s" para string (nome), "i" para integer (id)
+$user = $result->fetch_assoc();
+$stmt_check->close();
 
-if ($stmt->execute()) {
-    // Verifica se alguma linha foi realmente alterada
-    if ($stmt->affected_rows > 0) {
-        echo json_encode(['success' => true, 'msg' => 'Perfil atualizado com sucesso!']);
-    } else {
-        echo json_encode(['success' => false, 'msg' => 'Nenhum dado foi alterado.']);
+if (!password_verify($currentPassword, $user['senha'])) {
+    send_json_response(false, 'A sua senha atual está incorreta.');
+}
+
+$updatesMade = [];
+$message = [];
+
+// --- 2. Atualizar o Nome ---
+if (!empty($newName) && $newName !== $user['nome']) {
+    $sql_update_name = "UPDATE usuarios SET nome = ? WHERE id = ?";
+    $stmt_name = $conn->prepare($sql_update_name);
+    $stmt_name->bind_param('si', $newName, $userId);
+    if ($stmt_name->execute()) {
+        $updatesMade['newName'] = $newName;
+        $message[] = 'Nome atualizado.';
     }
-} else {
-    echo json_encode(['success' => false, 'msg' => 'Erro ao atualizar o perfil.']);
+    $stmt_name->close();
 }
 
-$stmt->close();
+// --- 3. Atualizar o E-mail ---
+if (!empty($newEmail) && $newEmail !== $user['email']) {
+    $sql_check_email = "SELECT id FROM usuarios WHERE email = ? AND id != ?";
+    $stmt_email_check = $conn->prepare($sql_check_email);
+    $stmt_email_check->bind_param('si', $newEmail, $userId);
+    $stmt_email_check->execute();
+    if ($stmt_email_check->get_result()->num_rows > 0) {
+        send_json_response(false, 'O novo e-mail já está a ser utilizado por outra conta.');
+    }
+    $stmt_email_check->close();
+
+    $sql_update_email = "UPDATE usuarios SET email = ? WHERE id = ?";
+    $stmt_email = $conn->prepare($sql_update_email);
+    $stmt_email->bind_param('si', $newEmail, $userId);
+    if ($stmt_email->execute()) {
+        $updatesMade['newEmail'] = $newEmail;
+        $message[] = 'E-mail atualizado.';
+    }
+    $stmt_email->close();
+}
+
+// --- 4. Atualizar a Senha ---
+if (!empty($newPassword)) {
+    $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+    $sql_update_pass = "UPDATE usuarios SET senha = ? WHERE id = ?";
+    $stmt_pass = $conn->prepare($sql_update_pass);
+    $stmt_pass->bind_param('si', $newPasswordHash, $userId);
+    if ($stmt_pass->execute()) {
+        $updatesMade['passwordChanged'] = true;
+        $message[] = 'Senha atualizada.';
+    }
+    $stmt_pass->close();
+}
+
+if (empty($updatesMade)) {
+    send_json_response(false, 'Nenhum dado novo foi fornecido ou os dados são iguais aos atuais.');
+}
+
+send_json_response(true, 'Dados atualizados com sucesso! ' . implode(' ', $message), ['updatedFields' => $updatesMade]);
+
 $conn->close();
 ?>

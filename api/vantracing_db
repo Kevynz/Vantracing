@@ -46,12 +46,17 @@ CREATE TABLE `criancas` (
     ON DELETE CASCADE
 );
 
+CREATE TABLE password_resets (
+    email VARCHAR(100) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    PRIMARY KEY (email)
+);
+
 SHOW DATABASES;
 SHOW TABLES;
 DESCRIBE usuarios;
 DESCRIBE criancas;
 SELECT id, nome, email, senha, role, data_cadastro FROM usuarios;
-SELECT id, nome, data_nascimento, escola, usuario_id role FROM criancas;
-
-
-
+SELECT id, nome, data_nascimento, escola, usuario_id, observacoes role FROM criancas;
+select email, token, expires_at from password_resets;

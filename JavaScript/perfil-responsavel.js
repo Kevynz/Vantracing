@@ -107,26 +107,116 @@ document.addEventListener('DOMContentLoaded', function() {
         carregarCriancas();
 
         // --- 4. LÓGICA DOS FORMULÁRIOS DE SEGURANÇA E EXCLUSÃO ---
+        const apiUpdateUrl = 'api/update_account.php';
         const apiDeleteUrl = 'api/delete_account.php';
         
         const updateInfoForm = document.getElementById('updateInfoForm');
         if(updateInfoForm) {
             updateInfoForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
+                e.preventDefault(); // Impede o recarregamento da página
+
+                // Pega os dados do formulário
+                const newName = document.getElementById('new-name').value;
+                const newEmail = document.getElementById('new-email').value;
+                const currentPassword = document.getElementById('info-current-password').value;
+
+                // Validação simples
+                if (!currentPassword) {
+                    alert('Você precisa digitar sua senha atual para confirmar a alteração.');
+                    return;
+                }
+
+                // Prepara os dados para envio
                 const formData = new FormData();
                 formData.append('id', usuarioLogado.id);
-                formData.append('new_name', document.getElementById('new-name').value);
-                formData.append('new_email', document.getElementById('new-email').value);
-                formData.append('current_password', document.getElementById('info-current-password').value);
-                // ... (resto da lógica de fetch)
+                formData.append('new_name', newName);
+                formData.append('new_email', newEmail);
+                formData.append('current_password', currentPassword);
+
+                try {
+                    // Envia os dados para o script PHP (A LÓGICA QUE FALTAVA)
+                    const response = await fetch('api/update_account.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json(); // Converte a resposta do servidor para JSON
+
+                    // Exibe a mensagem do servidor (sucesso ou erro)
+                    alert(result.msg);
+
+                    // Se a atualização foi bem-sucedida, atualiza os dados na página
+                    if (result.success) {
+                        if (result.updatedFields.newName) {
+                            usuarioLogado.nome = result.updatedFields.newName;
+                            document.getElementById('user-nome-display').textContent = usuarioLogado.nome;
+                        }
+                        if (result.updatedFields.newEmail) {
+                            usuarioLogado.email = result.updatedFields.newEmail;
+                        }
+                        sessionStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+
+                        // Limpa o campo de senha atual
+                        document.getElementById('info-current-password').value = ''; 
+                    }
+                } catch (error) {
+                    console.error('Erro ao tentar atualizar as informações:', error);
+                    alert('Ocorreu um erro de comunicação. Verifique o console para mais detalhes.');
+                }
             });
         }
         
-        const updatePasswordForm = document.getElementById('updatePasswordForm');
-        if(updatePasswordForm) {
+                const updatePasswordForm = document.getElementById('updatePasswordForm');
+        if (updatePasswordForm) {
             updatePasswordForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                // ... (código do formulário de senha aqui) ...
+                e.preventDefault(); // Impede o recarregamento da página
+
+                // Pega os dados do formulário de senha
+                const currentPassword = document.getElementById('pass-current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-new-password').value;
+
+                // Validações no lado do cliente
+                if (newPassword.length < 8) {
+                    alert('A nova senha deve ter no mínimo 8 caracteres.');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    alert('As novas senhas não coincidem.');
+                    return;
+                }
+                if (!currentPassword) {
+                    alert('Você precisa digitar sua senha atual para confirmar a alteração.');
+                    return;
+                }
+
+                // Prepara os dados para envio
+                const formData = new FormData();
+                formData.append('id', usuarioLogado.id);
+                formData.append('current_password', currentPassword);
+                formData.append('new_password', newPassword);
+
+                try {
+                    // Envia os dados para o mesmo script PHP de antes
+                    const response = await fetch('api/update_account.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json(); // Converte a resposta
+
+                    // Exibe a mensagem do servidor
+                    alert(result.msg);
+
+                    // Se a alteração foi bem-sucedida, limpa os campos do formulário de senha
+                    if (result.success) {
+                        this.reset(); // 'this' se refere ao próprio formulário
+                    }
+
+                } catch (error) {
+                    console.error('Erro ao tentar alterar a senha:', error);
+                    alert('Ocorreu um erro de comunicação. Verifique o console para mais detalhes.');
+                }
             });
         }
 
