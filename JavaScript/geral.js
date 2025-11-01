@@ -608,6 +608,19 @@ document.addEventListener('DOMContentLoaded', function() {
         themeToggleBtn.addEventListener('click', toggleTheme);
     }
 
+    // Ajusta dinamicamente o link de "Perfil" conforme o papel do usuário logado
+    // Dynamically route the "Perfil" link based on the logged-in user's role
+    try {
+        const perfilLinkEl = document.getElementById('perfil-link');
+        const rawSession = sessionStorage.getItem('usuarioLogado');
+        if (perfilLinkEl && rawSession) {
+            const user = JSON.parse(rawSession);
+            if (user && user.role) {
+                perfilLinkEl.setAttribute('href', user.role === 'motorista' ? 'perfilmotorista.html' : 'perfil.html');
+            }
+        }
+    } catch (_) { /* noop */ }
+
     // --- Lógica Específica da Página de Login ---
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
