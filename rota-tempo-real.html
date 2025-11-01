@@ -49,8 +49,11 @@
     <div class="container mt-5 pt-5">
         <div class="row">
             <div class="col-12">
-                <h2 class="mb-4" data-i18n="realTimeTracking">Rota em Tempo Real</h2>
-                <p>Acompanhe a localização do motorista em tempo real.</p>
+                <h2 class="mb-1" data-i18n="realTimeTracking">Rota em Tempo Real</h2>
+                <div class="d-flex align-items-center mb-3">
+                  <p class="mb-0 me-3">Acompanhe a localização do motorista em tempo real.</p>
+                  <span class="badge bg-secondary" id="share-status-map">Compartilhamento: desconhecido</span>
+                </div>
                 <div class="card mb-4">
                     <div class="card-body p-0">
                         <div id="map" style="height: 420px; width: 100%;"></div>
@@ -104,6 +107,15 @@
                 if (typeof initMapTracking === 'function') {
                     initMapTracking();
                 }
+                const statusEl = document.getElementById('share-status-map');
+                function refresh(){
+                  const on = typeof getSharingStatus==='function' ? getSharingStatus() : false;
+                  statusEl.textContent = on ? 'Compartilhamento: ligado' : 'Compartilhamento: desligado';
+                  statusEl.classList.toggle('bg-success', on);
+                  statusEl.classList.toggle('bg-secondary', !on);
+                }
+                refresh();
+                window.addEventListener('storage', refresh);
             });
         </script>
 </body>

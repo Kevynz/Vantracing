@@ -44,22 +44,22 @@
                     </div>
                 </div>
                 <div class="list-group mb-4">
-                    <a href="#" data-section="info-section" class="list-group-item list-group-item-action active">Minhas Informações</a>
-                    <a href="#" data-section="seguranca-section" class="list-group-item list-group-item-action">Segurança</a>
+                    <a href="#" data-section="info-section" class="list-group-item list-group-item-action active" data-i18n="myInfo">Minhas Informações</a>
+                    <a href="#" data-section="seguranca-section" class="list-group-item list-group-item-action" data-i18n="security">Segurança</a>
                 </div>
             </div>
             <div class="col-md-9">
                 <div id="info-section" class="profile-section active">
                     <div class="card">
-                        <div class="card-header"><h4 class="mb-0">Dados do Motorista</h4></div>
+                        <div class="card-header"><h4 class="mb-0" data-i18n="driverData">Dados do Motorista</h4></div>
                         <div class="card-body">
                             <form>
                                 <div class="mb-3">
-                                    <label for="motorista-cpf" class="form-label">CPF</label>
+                                    <label for="motorista-cpf" class="form-label" data-i18n="cpf">CPF</label>
                                     <input type="text" id="motorista-cpf" class="form-control" readonly disabled>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="motorista-cnh" class="form-label">CNH</label>
+                                    <label for="motorista-cnh" class="form-label" data-i18n="cnh">CNH</label>
                                     <input type="text" id="motorista-cnh" class="form-control" readonly disabled>
                                 </div>
                                 <small class="form-text text-muted">Para alterar estes dados, por favor, entre em contato com o suporte.</small>
@@ -70,45 +70,45 @@
 
                 <div id="seguranca-section" class="profile-section">
                      <div class="card">
-                        <div class="card-header"><h4 class="mb-0">Segurança da Conta</h4></div>
+                        <div class="card-header"><h4 class="mb-0" data-i18n="accountSecurity">Segurança da Conta</h4></div>
                         <div class="card-body">
                             <form id="updateInfoForm" class="mb-5">
-                                <h5>Alterar Informações</h5>
+                                <h5 data-i18n="changeInfo">Alterar Informações</h5>
                                 <div class="mb-3">
-                                    <label for="new-name" class="form-label">Nome Completo</label>
+                                    <label for="new-name" class="form-label" data-i18n="fullName">Nome Completo</label>
                                     <input type="text" class="form-control" id="new-name" placeholder="Seu nome completo">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="new-email" class="form-label">E-mail</label>
+                                    <label for="new-email" class="form-label" data-i18n="email">E-mail</label>
                                     <input type="email" class="form-control" id="new-email" placeholder="Seu novo e-mail">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="info-current-password" class="form-label">Senha Atual (para confirmar)</label>
+                                    <label for="info-current-password" class="form-label" data-i18n="currentPassword">Senha Atual (para confirmar)</label>
                                     <input type="password" class="form-control" id="info-current-password" required placeholder="Digite sua senha atual">
                                 </div>
-                                <button type="submit" class="btn btn-primary">Salvar Informações</button>
+                                <button type="submit" class="btn btn-primary" data-i18n="saveInfo">Salvar Informações</button>
                             </form>
                             <hr>
                             <form id="updatePasswordForm" class="mb-5">
-                                <h5>Alterar Senha</h5>
+                                <h5 data-i18n="changePassword">Alterar Senha</h5>
                                 <div class="mb-3">
-                                    <label for="pass-current-password" class="form-label">Senha Atual</label>
+                                    <label for="pass-current-password" class="form-label" data-i18n="currentPassword">Senha Atual</label>
                                     <input type="password" class="form-control" id="pass-current-password" required placeholder="Digite sua senha atual">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="new-password" class="form-label">Nova Senha</label>
+                                    <label for="new-password" class="form-label" data-i18n="newPassword">Nova Senha</label>
                                     <input type="password" class="form-control" id="new-password" required placeholder="Mínimo 8 caracteres">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="confirm-new-password" class="form-label">Confirmar Nova Senha</label>
+                                    <label for="confirm-new-password" class="form-label" data-i18n="confirmNewPassword">Confirmar Nova Senha</label>
                                     <input type="password" class="form-control" id="confirm-new-password" required placeholder="Repita a nova senha">
                                 </div>
-                                <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                                <button type="submit" class="btn btn-primary" data-i18n="changePassword">Alterar Senha</button>
                             </form>
                             <hr>
                             <div class="p-3 border border-danger rounded">
                                 <p>A exclusão da sua conta é uma ação irreversível e removerá todos os seus dados.</p>
-                                <button id="delete-account-btn" class="btn btn-danger">Excluir Minha Conta</button>
+                                <button id="delete-account-btn" class="btn btn-danger" data-i18n="deleteAccount">Excluir Minha Conta</button>
                             </div>
                         </div>
                     </div>

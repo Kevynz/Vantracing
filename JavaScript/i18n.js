@@ -64,6 +64,19 @@ const translations = {
         updateProfile: "Atualizar Perfil",
         deleteAccount: "Excluir Conta",
         
+        // Driver Profile / Perfil do Motorista
+        driverData: "Dados do Motorista",
+        cpf: "CPF",
+        cnh: "CNH",
+        myInfo: "Minhas Informações",
+        security: "Segurança",
+        accountSecurity: "Segurança da Conta",
+        changeInfo: "Alterar Informações",
+        fullName: "Nome Completo",
+        currentPassword: "Senha Atual (para confirmar)",
+        saveInfo: "Salvar Informações",
+        confirmNewPassword: "Confirmar Nova Senha",
+        
         // Children / Crianças
         addChild: "Adicionar Criança",
         childName: "Nome da Criança",
@@ -160,6 +173,19 @@ const translations = {
         address: "Address",
         updateProfile: "Update Profile",
         deleteAccount: "Delete Account",
+        
+        // Driver Profile
+        driverData: "Driver Data",
+        cpf: "CPF",
+        cnh: "Driver's License",
+        myInfo: "My Information",
+        security: "Security",
+        accountSecurity: "Account Security",
+        changeInfo: "Change Information",
+        fullName: "Full Name",
+        currentPassword: "Current Password (to confirm)",
+        saveInfo: "Save Information",
+        confirmNewPassword: "Confirm New Password",
         
         // Children
         addChild: "Add Child",

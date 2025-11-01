@@ -19,10 +19,17 @@
   let map, marker, accuracyCircle;
   let followDriver = true;
 
-  function getDriverId(){
-    const params = new URLSearchParams(location.search);
-    const id = parseInt(params.get('driver_id') || '1', 10);
-    return isNaN(id) || id <= 0 ? 1 : id;
+  // Sharing state helpers
+  const SHARING_KEY = 'sharing_enabled';
+  let watchId = null;
+
+  function isSharingEnabled(){
+    const v = localStorage.getItem(SHARING_KEY);
+    return v === null ? false : v === 'true';
+  }
+  function setSharingEnabled(enabled){
+    localStorage.setItem(SHARING_KEY, enabled ? 'true' : 'false');
+    window.dispatchEvent(new Event('storage')); // notify listeners
   }
 
   // Formats lat/lng nicely
@@ -85,12 +92,10 @@
     };
     followCtrl.addTo(map);
 
-    const driverId = getDriverId();
-
     // Poll backend first; fallback to localStorage
     setInterval(async ()=>{
       try {
-        const res = await fetch(`api/get_location.php?driver_id=${driverId}`, { cache: 'no-store' });
+        const res = await fetch('api/get_location.php', { cache: 'no-store', credentials: 'include' });
         if (res.ok) {
           const json = await res.json();
           if (json && json.success && json.data) {
@@ -149,21 +154,43 @@
       console.warn('Geolocation not supported in this browser.');
       return;
     }
-    const driverId = getDriverId();
-    navigator.geolocation.watchPosition((pos)=>{
+    if (!isSharingEnabled()) {
+      console.info('Location sharing disabled.');
+      return;
+    }
+    // start watching
+    watchId = navigator.geolocation.watchPosition((pos)=>{
       const { latitude, longitude, accuracy } = pos.coords;
       saveStoredPosition({ lat: latitude, lng: longitude, accuracy });
       // Send to backend as well (best-effort)
       const body = new URLSearchParams({
-        driver_id: String(driverId),
         lat: String(latitude),
         lng: String(longitude),
         accuracy: accuracy != null ? String(accuracy) : ''
       });
-      fetch('api/update_location.php', { method: 'POST', body, keepalive: true }).catch(()=>{});
+      fetch('api/update_location.php', { method: 'POST', body, keepalive: true, credentials: 'include' }).catch(()=>{});
     }, (err)=>{
       console.warn('Geolocation error:', err.message);
     }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 });
+  };
+
+  window.enableSharing = function enableSharing(){
+    if (!isSharingEnabled()) {
+      setSharingEnabled(true);
+      if (watchId === null) window.initDriverTracking();
+    }
+  };
+
+  window.disableSharing = function disableSharing(){
+    setSharingEnabled(false);
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+  };
+
+  window.getSharingStatus = function getSharingStatus(){
+    return isSharingEnabled();
   };
 
   // Simple demo path around starting point when no real data

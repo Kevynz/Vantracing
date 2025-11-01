@@ -1,31 +1,42 @@
 <?php
-// api/get_perfil.php
-
+// api/get_perfil.php (PDO + normalized profile)
 require 'db_connect.php';
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-// Pega o ID do usuário enviado pelo front-end via GET
-$userId = $_GET['id'] ?? 0;
-
+$userId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($userId <= 0) {
     echo json_encode(['success' => false, 'msg' => 'ID de usuário inválido.']);
     exit();
 }
 
-// Prepara a query para buscar o usuário, mas NUNCA a senha!
-$sql = "SELECT id, nome, email, cpf, cnh, data_nascimento, role FROM usuarios WHERE id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $userId); // "i" significa que o parâmetro é um inteiro
-$stmt->execute();
-$result = $stmt->get_result();
+try {
+    // Busca dados principais do usuário (sem senha)
+    $stmt = $conn->prepare('SELECT id, nome, email, role FROM usuarios WHERE id = ?');
+    $stmt->execute([$userId]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($result->num_rows === 1) {
-    $user = $result->fetch_assoc();
+    if (!$user) {
+        echo json_encode(['success' => false, 'msg' => 'Usuário não encontrado.']);
+        exit();
+    }
+
+    // Busca perfil específico
+    if ($user['role'] === 'motorista') {
+        $stmtP = $conn->prepare('SELECT cpf, data_nascimento, cnh FROM motoristas WHERE usuario_id = ?');
+        $stmtP->execute([$user['id']]);
+        $profile = $stmtP->fetch(PDO::FETCH_ASSOC);
+        if ($profile) $user['profile'] = $profile;
+    } elseif ($user['role'] === 'responsavel') {
+        $stmtP = $conn->prepare('SELECT cpf, data_nascimento FROM responsaveis WHERE usuario_id = ?');
+        $stmtP->execute([$user['id']]);
+        $profile = $stmtP->fetch(PDO::FETCH_ASSOC);
+        if ($profile) $user['profile'] = $profile;
+    }
+
     echo json_encode(['success' => true, 'user' => $user]);
-} else {
-    echo json_encode(['success' => false, 'msg' => 'Usuário não encontrado.']);
+} catch (Throwable $e) {
+    error_log('get_perfil error: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'msg' => 'Erro no servidor.']);
 }
-
-$stmt->close();
-$conn->close();
 ?>

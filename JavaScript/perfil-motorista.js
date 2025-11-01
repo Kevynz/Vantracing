@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log("Script do perfil do motorista carregado com sucesso!");
 
     try {
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const apiUpdateUrl = 'api/update_account.php';
         const apiDeleteUrl = 'api/delete_account.php';
-        let csrfToken = null;
+    let csrfToken = null;
 
         // Fetch CSRF token if available (session-based backends)
         // Busca token CSRF se disponível (backends com sessão)
@@ -81,6 +81,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch(_) { /* ignore */ }
 
+        // Simple Bootstrap alert helper / Helper simples de alertas Bootstrap
+        function showAlert(type, message) {
+            let container = document.getElementById('alert-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'alert-container';
+                container.style.position = 'sticky';
+                container.style.top = '4rem';
+                container.style.zIndex = '1030';
+                document.querySelector('.container')?.prepend(container);
+            }
+            const div = document.createElement('div');
+            div.className = `alert alert-${type} alert-dismissible fade show`;
+            div.setAttribute('role', 'alert');
+            div.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
+            container.appendChild(div);
+            setTimeout(()=>{ div.classList.remove('show'); div.remove(); }, 5000);
+        }
+
         // Event listener para o formulário de Alterar Informações
         const updateInfoForm = document.getElementById('updateInfoForm');
         if (updateInfoForm) {
@@ -91,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const currentPassword = document.getElementById('info-current-password').value;
 
                 if (!currentPassword) {
-                    return alert('Você precisa digitar sua senha atual para confirmar a alteração.');
+                    return showAlert('warning','Você precisa digitar sua senha atual para confirmar a alteração.');
                 }
 
                 const formData = new FormData();
@@ -103,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const response = await fetch(apiUpdateUrl, { method: 'POST', body: formData, credentials: 'include' });
                 const result = await response.json();
-                alert(result.msg);
+                showAlert(result.success ? 'success' : 'danger', result.msg);
 
                 if (result.success) {
                     if (result.updatedFields.newName) usuarioLogado.nome = result.updatedFields.newName;
@@ -124,8 +143,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const confirmPassword = document.getElementById('confirm-new-password').value;
                 const currentPassword = document.getElementById('pass-current-password').value;
 
-                if (newPassword !== confirmPassword) return alert('As novas senhas não coincidem.');
-                if (newPassword.length < 8) return alert('A nova senha deve ter no mínimo 8 caracteres.');
+                if (newPassword !== confirmPassword) return showAlert('warning','As novas senhas não coincidem.');
+                if (newPassword.length < 8) return showAlert('warning','A nova senha deve ter no mínimo 8 caracteres.');
                 
                 const formData = new FormData();
                 formData.append('id', usuarioLogado.id);
@@ -135,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const response = await fetch(apiUpdateUrl, { method: 'POST', body: formData, credentials: 'include' });
                 const result = await response.json();
-                alert(result.msg);
+                showAlert(result.success ? 'success' : 'danger', result.msg);
                 if (result.success) this.reset();
             });
         }
@@ -153,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     const response = await fetch(apiDeleteUrl, { method: 'POST', body: formData, credentials: 'include' });
                     const result = await response.json();
-                    alert(result.msg);
+                    showAlert(result.success ? 'success' : 'danger', result.msg);
 
                     if (result.success) {
                         sessionStorage.clear();

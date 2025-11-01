@@ -24,6 +24,10 @@
                     <div class="card-body text-center p-5">
                         <img src="img/perfil.png" class="rounded-circle mb-3" width="100" alt="Avatar">
                         <h2 class="mb-4" data-i18n="driver">Motorista</h2>
+                        <div class="mb-3">
+                            <span class="badge bg-secondary" id="share-status">Compartilhamento: desligado</span>
+                            <button id="share-toggle" type="button" class="btn btn-outline-primary ms-2">Iniciar compartilhamento</button>
+                        </div>
                         <form id="cadastroForm" novalidate>
                             <div class="mb-3">
                                 <label for="cadastro-nome" class="form-label" data-i18n="name">Nome <span class="text-danger">*</span></label>
@@ -97,9 +101,23 @@
         <script src="JavaScript/tracking.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', () => {
-                if (typeof initDriverTracking === 'function') {
-                    initDriverTracking();
+                const statusEl = document.getElementById('share-status');
+                const btn = document.getElementById('share-toggle');
+                function refreshUI(){
+                    const on = typeof getSharingStatus === 'function' ? getSharingStatus() : false;
+                    statusEl.textContent = on ? 'Compartilhamento: ligado' : 'Compartilhamento: desligado';
+                    btn.textContent = on ? 'Parar compartilhamento' : 'Iniciar compartilhamento';
+                    btn.classList.toggle('btn-outline-danger', on);
+                    btn.classList.toggle('btn-outline-primary', !on);
                 }
+                btn.addEventListener('click', ()=>{
+                    const on = typeof getSharingStatus === 'function' ? getSharingStatus() : false;
+                    if (on) { if (typeof disableSharing==='function') disableSharing(); }
+                    else { if (typeof enableSharing==='function') enableSharing(); }
+                    if (typeof initDriverTracking === 'function' && !on) initDriverTracking();
+                    refreshUI();
+                });
+                refreshUI();
             });
         </script>
     <!-- Ícones do Material Design (necessários para o botão de troca de tema) -->
