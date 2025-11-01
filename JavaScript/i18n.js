@@ -38,7 +38,14 @@ const translations = {
         chooseRole: "Escolha seu papel:",
         registerButton: "CADASTRAR",
         alreadyHaveAccount: "Já tem uma conta?",
-        login: "Logar",
+        loginLink: "Logar",
+        emailPlaceholder: "Digite seu e-mail",
+        passwordPlaceholder: "Digite sua senha",
+        namePlaceholder: "Digite seu nome",
+        isGuardian: "É responsável ?",
+        guardianRegister: "Cadastro Responsável",
+        isDriver: "É motorista ?",
+        driverRegister: "Cadastro Motorista",
         
         // Dashboard / Painel
         dashboard: "Painel de Controle",
@@ -128,7 +135,14 @@ const translations = {
         chooseRole: "Choose your role:",
         registerButton: "REGISTER",
         alreadyHaveAccount: "Already have an account?",
-        login: "Login",
+        loginLink: "Login",
+        emailPlaceholder: "Enter your email",
+        passwordPlaceholder: "Enter your password",
+        namePlaceholder: "Enter your name",
+        isGuardian: "Are you a guardian?",
+        guardianRegister: "Guardian Registration",
+        isDriver: "Are you a driver?",
+        driverRegister: "Driver Registration",
         
         // Dashboard
         dashboard: "Dashboard",
