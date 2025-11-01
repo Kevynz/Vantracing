@@ -514,5 +514,9 @@ Desktop.ini
 *.sqlite
 *.db
 
+# Explicit test database files (these should be ignored) / Arquivos de banco de testes (ignorar)
+database/*.sql
+api/vantracing_db/*.sql
+
 # Exceptions / Exceções
 !api/vantracing_db.sql

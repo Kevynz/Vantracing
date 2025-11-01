@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VanTracing - Nova Senha</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="Estilo.css">
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
@@ -14,7 +18,7 @@
             <div class="col-md-6 col-lg-4">
                 <div class="card shadow">
                     <div class="card-body text-center p-5">
-                        <h2 class="mb-4">Crie sua Nova Senha</h2>
+                        <h2 class="mb-4" data-i18n="resetPassword">Crie sua Nova Senha</h2>
                         <form id="novaSenhaForm">
                             <input type="hidden" id="reset-email-hidden">
                             
@@ -23,15 +27,15 @@
                                 <input type="text" class="form-control" id="reset-code" placeholder="Código recebido por e-mail" required>
                             </div>
                             <div class="mb-3">
-                                <label for="new-password" class="form-label">Nova Senha</label>
+                                <label for="new-password" class="form-label" data-i18n="newPassword">Nova Senha</label>
                                 <input type="password" class="form-control" id="new-password" placeholder="Mínimo de 8 caracteres" required>
                             </div>
                              <div class="mb-3">
-                                <label for="confirm-password" class="form-label">Confirmar Nova Senha</label>
+                                <label for="confirm-password" class="form-label" data-i18n="confirmPassword">Confirmar Nova Senha</label>
                                 <input type="password" class="form-control" id="confirm-password" placeholder="Repita a nova senha" required>
                             </div>
                             <div id="feedback" class="mb-3"></div>
-                            <button type="submit" class="btn btn-primary w-100 mb-3">Salvar Nova Senha</button>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" data-i18n="save">Salvar Nova Senha</button>
                         </form>
                     </div>
                 </div>
@@ -40,6 +44,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="JavaScript/i18n.js"></script>
     <script src="JavaScript/geral.js"></script>
 </body>
 </html>

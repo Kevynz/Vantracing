@@ -2,7 +2,30 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("Script do perfil do motorista carregado com sucesso!");
 
     try {
-        const usuarioLogado = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+        // Allow debug mode for local testing when no session exists
+        // Permite modo de depuração para testes locais quando não há sessão
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDebug = urlParams.get('debug') === '1' || urlParams.get('mock') === '1';
+
+        let usuarioLogado = null;
+        try {
+            usuarioLogado = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+        } catch (_) { /* ignore */ }
+
+        if (!usuarioLogado && isDebug && location.hostname === 'localhost') {
+            // Minimal mock user for local debug only
+            // Usuário simulado mínimo apenas para depuração local
+            usuarioLogado = {
+                id: 1,
+                nome: 'Motorista Demo',
+                email: 'motorista@demo.local',
+                role: 'motorista',
+                profile: { cpf: '12345678901', cnh: '12345678901' }
+            };
+            sessionStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+            console.info('Debug mode: using mocked usuarioLogado for local testing.');
+        }
+
         if (!usuarioLogado || usuarioLogado.role !== 'motorista') {
             alert("Acesso negado. Faça login como motorista.");
             window.location.href = 'index.html';
@@ -44,8 +67,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        const apiUpdateUrl = 'api/update_account.php';
-        const apiDeleteUrl = 'api/delete_account.php';
+    const apiUpdateUrl = 'api/update_account.php';
+    const apiDeleteUrl = 'api/delete_account.php';
 
         // Event listener para o formulário de Alterar Informações
         const updateInfoForm = document.getElementById('updateInfoForm');

@@ -8,6 +8,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main stylesheet / Estilo principal -->
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <!-- Favicon & theme color -->
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+    <!-- Leaflet CSS for map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 <body>
     <!-- Barra de Navegação Principal -->
@@ -20,19 +29,19 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                        <a class="nav-link" href="dashboard.html" data-i18n="dashboard">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="perfil.html">Perfil</a>
+                        <a class="nav-link" href="perfil.html" data-i18n="profile">Perfil</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="rota-tempo-real.html">Rota em Tempo Real</a>
+                        <a class="nav-link active" href="rota-tempo-real.html" data-i18n="realTimeTracking">Rota em Tempo Real</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="historico-rotas.html">Histórico de Rotas</a>
+                        <a class="nav-link" href="historico-rotas.html" data-i18n="routeHistory">Histórico de Rotas</a>
                     </li>
                 </ul>
-                <button id="logout-btn" class="btn btn-outline-light">Sair</button>
+                <button id="logout-btn" class="btn btn-outline-light" data-i18n="logout">Sair</button>
             </div>
         </div>
     </nav>
@@ -40,12 +49,11 @@
     <div class="container mt-5 pt-5">
         <div class="row">
             <div class="col-12">
-                <h2 class="mb-4">Rota em Tempo Real</h2>
+                <h2 class="mb-4" data-i18n="realTimeTracking">Rota em Tempo Real</h2>
                 <p>Acompanhe a localização do motorista em tempo real.</p>
                 <div class="card mb-4">
-                    <div class="card-body bg-light p-5 text-center" id="map-placeholder">
-                        <i class="fas fa-map-marked-alt fa-5x text-secondary mb-3"></i>
-                        <p class="lead">[Mapa fictício - Integre uma API como Google Maps aqui]</p>
+                    <div class="card-body p-0">
+                        <div id="map" style="height: 420px; width: 100%;"></div>
                     </div>
                 </div>
             </div>
@@ -80,12 +88,23 @@
 
     <!-- Bootstrap JS Bundle com Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
-    <!-- Estilos do tema -->
-    <link rel="stylesheet" href="Estilo.css">
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="JavaScript/i18n.js"></script>
+    <!-- Leaflet JS for map -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Tracking logic -->
+    <script src="JavaScript/tracking.js"></script>
     <!-- Ícones do Material Design (necessários para o botão de troca de tema) -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <!-- Script do tema -->
-    <script src="JavaScript/geral.js"></script>
+        <!-- JavaScript geral -->
+        <script src="JavaScript/geral.js"></script>
+        <script>
+            // Initialize map tracking on this page
+            document.addEventListener('DOMContentLoaded', () => {
+                if (typeof initMapTracking === 'function') {
+                    initMapTracking();
+                }
+            });
+        </script>
 </body>
 </html>
