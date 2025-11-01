@@ -1,9 +1,10 @@
-
 // ---------------------------------------------------------------------------------
+// SECTION 1: THEME MANAGEMENT (LIGHT/DARK)
 // SEÇÃO 1: GERENCIAMENTO DE TEMA (CLARO/ESCURO)
 // ---------------------------------------------------------------------------------
 
 /**
+ * Toggles between light and dark theme, saving the preference to localStorage.
  * Alterna entre o tema claro e escuro, salvando a preferência no localStorage.
  */
 function toggleTheme() {
@@ -12,16 +13,17 @@ function toggleTheme() {
 
     if (isDark) {
         localStorage.setItem('theme', 'dark');
-        updateThemeIcon('light_mode'); // Ícone para ativar modo claro
+        updateThemeIcon('light_mode'); // Icon to activate light mode / Ícone para ativar modo claro
     } else {
         localStorage.setItem('theme', 'light');
-        updateThemeIcon('dark_mode'); // Ícone para ativar modo escuro
+        updateThemeIcon('dark_mode'); // Icon to activate dark mode / Ícone para ativar modo escuro
     }
 }
 
 /**
+ * Updates the theme toggle button icon.
  * Atualiza o ícone do botão de alternância de tema.
- * @param {string} iconName - O nome do ícone a ser exibido (ex: 'light_mode', 'dark_mode').
+ * @param {string} iconName - The icon name to display (e.g., 'light_mode', 'dark_mode') / O nome do ícone a ser exibido.
  */
 function updateThemeIcon(iconName) {
     const themeToggleIcon = document.getElementById('theme-toggle-icon');
@@ -31,8 +33,8 @@ function updateThemeIcon(iconName) {
 }
 
 /**
- * Detecta o tema preferido do usuário (salvo no localStorage ou preferência do sistema)
- * e o aplica ao carregar a página.
+ * Detects the user's preferred theme (saved in localStorage or system preference) and applies it on page load.
+ * Detecta o tema preferido do usuário (salvo no localStorage ou preferência do sistema) e o aplica ao carregar a página.
  */
 function detectPreferredTheme() {
     const savedTheme = localStorage.getItem('theme');
@@ -44,13 +46,14 @@ function detectPreferredTheme() {
         document.body.classList.remove('dark-theme');
         updateThemeIcon('dark_mode');
     } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        // Se não houver tema salvo, usa a preferência do sistema operacional
+        // If no theme saved, use OS preference / Se não houver tema salvo, usa a preferência do sistema operacional
         document.body.classList.add('dark-theme');
         updateThemeIcon('light_mode');
     }
 }
 
 /**
+ * Creates and attaches the floating theme toggle button to the page body.
  * Cria e anexa o botão flutuante de alternância de tema ao corpo da página.
  */
 function createThemeToggle() {
@@ -66,21 +69,23 @@ function createThemeToggle() {
 
 
 // ---------------------------------------------------------------------------------
+// SECTION 2: AUTHENTICATION AND SESSION MANAGEMENT
 // SEÇÃO 2: AUTENTICAÇÃO E GERENCIAMENTO DE SESSÃO
 // ---------------------------------------------------------------------------------
 
 /**
+ * Verifies user login credentials against saved data in localStorage.
  * Verifica as credenciais de login de um usuário contra os dados salvos no localStorage.
- * @param {string} email - O e-mail do usuário.
- * @param {string} senha - A senha do usuário.
- * @returns {boolean} - Retorna true se o login for bem-sucedido, caso contrário, false.
+ * @param {string} email - The user's email / O e-mail do usuário.
+ * @param {string} senha - The user's password / A senha do usuário.
+ * @returns {boolean} - Returns true if login is successful, false otherwise / Retorna true se o login for bem-sucedido.
  */
 function verificarLogin(email, senha) {
     const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
     const usuarioEncontrado = usuarios.find(usuario => usuario.email === email && usuario.senha === senha);
 
     if (usuarioEncontrado) {
-        // Armazena os dados do usuário logado na sessão do navegador
+        // Stores logged-in user data in browser session / Armazena os dados do usuário logado na sessão do navegador
         sessionStorage.setItem('usuarioLogado', JSON.stringify(usuarioEncontrado));
         return true;
     }
@@ -88,10 +93,10 @@ function verificarLogin(email, senha) {
 }
 
 /**
+ * Handles the login form submission.
  * Lida com a submissão do formulário de login.
- * @param {Event} e - O objeto de evento do formulário.
+ * @param {Event} e - The form event object / O objeto de evento do formulário.
  */
-
 async function handleLoginSubmit(e) {
     e.preventDefault();
 
@@ -119,20 +124,21 @@ async function handleLoginSubmit(e) {
             return;
         }
 
-        // Login bem-sucedido!
-        // A lógica de salvar no front-end permanece a mesma
+        // Login successful! / Login bem-sucedido!
+        // Front-end save logic remains the same / A lógica de salvar no front-end permanece a mesma
         sessionStorage.setItem('usuarioLogado', JSON.stringify(data.user));
         window.location.href = 'dashboard.html';
 
     } catch (error) {
-        console.error('Erro ao conectar com a API:', error);
-        alert('Não foi possível conectar ao servidor. Tente novamente mais tarde.');
+        console.error('Error connecting to API / Erro ao conectar com a API:', error);
+        alert('Could not connect to server. Try again later. / Não foi possível conectar ao servidor. Tente novamente mais tarde.');
     }
 }
 
 /**
+ * Checks if a user is already logged in (used on public pages like login/register).
  * Verifica se um usuário já está logado (usado em páginas públicas como login/cadastro).
- * Se estiver logado, redireciona para o dashboard.
+ * If logged in, redirects to dashboard. / Se estiver logado, redireciona para o dashboard.
  */
 function verificarUsuarioLogado() {
     if (sessionStorage.getItem('usuarioLogado')) {
@@ -141,9 +147,10 @@ function verificarUsuarioLogado() {
 }
 
 /**
+ * Checks if the user is authenticated to access protected pages.
  * Verifica se o usuário está autenticado para acessar páginas protegidas.
- * Se não estiver logado, redireciona para a página de login.
- * @returns {object | undefined} O objeto do usuário se estiver logado, ou undefined se não estiver.
+ * If not logged in, redirects to login page. / Se não estiver logado, redireciona para a página de login.
+ * @returns {object | undefined} The user object if logged in / O objeto do usuário se estiver logado.
  */
 function verificarAutenticacao() {
     const usuarioLogado = sessionStorage.getItem('usuarioLogado');
@@ -156,34 +163,37 @@ function verificarAutenticacao() {
 }
 
 /**
+ * Logs out the user, clearing session data and redirecting to login.
  * Realiza o logout do usuário, limpando os dados da sessão e redirecionando para o login.
  */
 function logout() {
     sessionStorage.removeItem('usuarioLogado');
-    // Limpa outros dados de sessão ou locais que possam existir
+    // Clears other session or local data that may exist / Limpa outros dados de sessão ou locais que possam existir
     localStorage.removeItem('authToken');
     sessionStorage.removeItem('userData');
+    // Use replace to prevent user from going back to dashboard with browser back button
     // Use replace para evitar que o usuário volte para a página anterior (dashboard) com o botão "Voltar" do navegador
     window.location.replace('index.html');
 }
 
 
 // ---------------------------------------------------------------------------------
+// SECTION 3: USER REGISTRATION AND PASSWORD VALIDATION
 // SEÇÃO 3: CADASTRO DE USUÁRIO E VALIDAÇÃO DE SENHA
 // ---------------------------------------------------------------------------------
 
 /**
+ * Saves a new user to localStorage after validation.
  * Salva um novo usuário no localStorage após validação.
- * @param {string} email - E-mail do usuário.
- * @param {string} senha - Senha do usuário.
- * @param {string} role - Perfil do usuário ('responsavel' ou 'motorista').
- * @param {string} cpf - CPF do usuário.
- * @param {string} dataNascimento - Data de nascimento do usuário.
- * @param {string} cnh - CNH do usuário (se aplicável).
- * @returns {boolean} - Retorna true se o usuário foi salvo, ou false se o e-mail já existe.
+ * @param {string} email - User's email / E-mail do usuário.
+ * @param {string} senha - User's password / Senha do usuário.
+ * @param {string} role - User's role ('responsavel' or 'motorista') / Perfil do usuário.
+ * @param {string} cpf - User's CPF / CPF do usuário.
+ * @param {string} dataNascimento - User's birth date / Data de nascimento do usuário.
+ * @param {string} cnh - User's driver's license (if applicable) / CNH do usuário (se aplicável).
+ * @returns {boolean} - Returns true if user was saved, false if email already exists / Retorna true se o usuário foi salvo.
  */
-
-    async function salvarUsuario(nome, email, senha, role, cpf, dataNascimento, cnh) {
+async function salvarUsuario(nome, email, senha, role, cpf, dataNascimento, cnh) {
         const formData = new FormData();
         formData.append('nome', nome);
         formData.append('email', email);

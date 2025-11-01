@@ -1,0 +1,518 @@
+# ============================================================================
+# VanTracing .gitignore
+# Professional Git Ignore Configuration
+# ============================================================================
+
+# ============================================================================
+# ENVIRONMENT & CONFIGURATION / AMBIENTE E CONFIGURAÇÃO
+# ============================================================================
+# Never commit environment files with sensitive data
+# Nunca faça commit de arquivos de ambiente com dados sensíveis
+.env
+.env.*
+!.env.example
+.env.local
+.env.production
+.env.staging
+.env.development
+.env.backup
+.env.*.local
+
+# Configuration files with credentials / Arquivos de config com credenciais
+config/database.php
+config/credentials.php
+config/secrets.php
+config.local.php
+
+# VanTracing Specific Config Files / Arquivos de Config Específicos
+api/.env
+api/config.php
+api/db_config.php
+vantracing_db.sql
+*_backup.sql
+database_*.sql
+
+# ============================================================================
+# IDE AND EDITOR FILES / ARQUIVOS DE IDE E EDITORES
+# ============================================================================
+# Visual Studio Code
+.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.code-workspace
+
+# JetBrains IDEs (PHPStorm, IntelliJ, WebStorm, etc.)
+.idea/
+.idea/*
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+
+# Atom
+.atom/
+
+# Eclipse
+.project
+.buildpath
+.settings/
+
+# NetBeans
+nbproject/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# ============================================================================
+# OPERATING SYSTEM FILES / ARQUIVOS DO SISTEMA OPERACIONAL
+# ============================================================================
+# macOS
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# PHP SPECIFIC / ESPECÍFICO DO PHP
+# ============================================================================
+# Composer
+vendor/
+composer.lock
+composer.phar
+auth.json
+
+# PHP temp files / Arquivos temporários PHP
+*.php~
+*.php.swp
+*.php.swo
+*.php.bak
+
+# PHPUnit
+.phpunit.result.cache
+phpunit.xml
+.phpunit.cache/
+build/
+coverage/
+
+# PHP CS Fixer
+.php_cs
+.php_cs.cache
+.php-cs-fixer.cache
+
+# PHP Stan
+phpstan.neon.local
+
+# Psalm
+psalm.xml
+
+# ============================================================================
+# LOGS AND DEBUGGING / LOGS E DEPURAÇÃO
+# ============================================================================
+logs/
+*.log
+error_log
+debug.log
+php_errors.log
+access.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ============================================================================
+# TEMPORARY FILES / ARQUIVOS TEMPORÁRIOS
+# ============================================================================
+tmp/
+temp/
+*.tmp
+*.temp
+*.swp
+*.swo
+*.swn
+*.bak
+*.backup
+*.old
+*.orig
+*~
+
+# ============================================================================
+# UPLOADS AND USER CONTENT / UPLOADS E CONTEÚDO DO USUÁRIO
+# ============================================================================
+# Keep directory structure but ignore uploaded files
+# Mantém estrutura de diretórios mas ignora arquivos enviados
+uploads/*
+!uploads/.gitkeep
+!uploads/README.md
+
+uploads/avatars/*
+!uploads/avatars/.gitkeep
+
+uploads/documents/*
+!uploads/documents/.gitkeep
+
+uploads/images/*
+!uploads/images/.gitkeep
+
+uploads/temp/*
+!uploads/temp/.gitkeep
+
+# User generated content / Conteúdo gerado pelo usuário
+public/uploads/*
+!public/uploads/.gitkeep
+
+storage/uploads/*
+!storage/uploads/.gitkeep
+
+# ============================================================================
+# CACHE AND COMPILED FILES / CACHE E ARQUIVOS COMPILADOS
+# ============================================================================
+cache/
+*.cache
+*.compiled
+.cache/
+
+# PHP OPcache
+opcache/
+
+# Session files / Arquivos de sessão
+sessions/
+tmp/sessions/
+session_*
+*.session
+
+# PHP Session files / Arquivos de sessão PHP
+/tmp/sess_*
+sess_*
+
+# Template cache / Cache de templates
+storage/cache/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+
+# ============================================================================
+# NODE MODULES AND JAVASCRIPT / MÓDULOS NODE E JAVASCRIPT
+# ============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.pnp.*
+.yarn/
+
+# Build output / Saída de build
+dist/
+build/
+public/build/
+assets/build/
+
+# ============================================================================
+# SECURITY AND SENSITIVE DATA / SEGURANÇA E DADOS SENSÍVEIS
+# ============================================================================
+# SSL certificates / Certificados SSL
+*.key
+*.pem
+*.p12
+*.pfx
+*.cert
+*.crt
+*.csr
+*.der
+
+# SSH keys / Chaves SSH
+id_rsa
+id_rsa.pub
+id_dsa
+id_dsa.pub
+
+# API keys and tokens / Chaves de API e tokens
+*.token
+api-keys.txt
+secrets.txt
+credentials.json
+service-account.json
+firebase-adminsdk.json
+google-credentials.json
+
+# Database files / Arquivos de banco de dados
+*.sqlite
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# Backup files / Arquivos de backup
+backups/
+*.sql.gz
+*.sql.bz2
+*.sql.zip
+backup-*.sql
+
+# ============================================================================
+# TEST COVERAGE / COBERTURA DE TESTES
+# ============================================================================
+coverage/
+.nyc_output/
+*.lcov
+*.coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# ============================================================================
+# DOCUMENTATION BUILD / BUILD DE DOCUMENTAÇÃO
+# ============================================================================
+docs/_build/
+docs/.doctrees/
+site/
+_site/
+
+# ============================================================================
+# PACKAGE MANAGERS / GERENCIADORES DE PACOTES
+# ============================================================================
+# Bower
+bower_components/
+
+# PNPM
+.pnpm-store/
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# ============================================================================
+# BUILD TOOLS / FERRAMENTAS DE BUILD
+# ============================================================================
+# Webpack
+.webpack/
+
+# Parcel
+.parcel-cache/
+
+# Vite
+.vite/
+
+# Grunt
+.grunt/
+
+# Gulp
+.gulp/
+
+# ============================================================================
+# VERSION CONTROL / CONTROLE DE VERSÃO
+# ============================================================================
+# Git merge files / Arquivos de merge do Git
+*.orig
+
+# SVN
+.svn/
+
+# Mercurial
+.hg/
+.hgignore
+
+# ============================================================================
+# DOCKER / DOCKER
+# ============================================================================
+docker-compose.override.yml
+.docker/
+*.dockerfile.local
+
+# ============================================================================
+# CLOUD AND DEPLOYMENT / NUVEM E IMPLANTAÇÃO
+# ============================================================================
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Serverless
+.serverless/
+
+# AWS
+.aws/
+
+# Azure
+.azure/
+
+# Heroku
+.heroku/
+
+# ============================================================================
+# MOBILE DEVELOPMENT / DESENVOLVIMENTO MOBILE
+# ============================================================================
+# React Native
+.expo/
+.expo-shared/
+
+# Capacitor
+android/
+ios/
+.capacitor/
+
+# Cordova
+platforms/
+plugins/
+
+# ============================================================================
+# EXCEPTIONS / EXCEÇÕES
+# ============================================================================
+# Keep these important files / Manter estes arquivos importantes
+!.gitignore
+!.gitattributes
+!.editorconfig
+!.htaccess
+!.env.example
+!README.md
+!LICENSE
+!CONTRIBUTING.md
+!CHANGELOG.md
+
+# Keep database schema / Manter esquema do banco de dados
+!api/vantracing_db.sql
+!database/schema.sql
+!database/migrations/
+
+# Keep documentation / Manter documentação
+!docs/
+!docs/**/*.md
+
+# ============================================================================
+# PROJECT SPECIFIC / ESPECÍFICO DO PROJETO
+# ============================================================================
+# VanTracing specific ignores / Ignores específicos do VanTracing
+
+# Test files (keep test.html in repo for now)
+# Arquivos de teste (manter test.html no repo por enquanto)
+# test.html
+# TEST_REPORT.md
+
+# PowerShell verification scripts (optional)
+# Scripts de verificação PowerShell (opcional)
+verify-project.ps1
+
+# Local configuration overrides / Sobrescrita de configuração local
+config.local.json
+settings.local.json
+
+# User data and uploads / Dados de usuário e uploads
+uploads/avatars/*
+uploads/documents/*
+uploads/images/*
+uploads/temp/*
+!uploads/**/.gitkeep
+!uploads/**/README.md
+
+# Application logs / Logs da aplicação
+logs/*.log
+logs/*.txt
+logs/error_*.log
+logs/access_*.log
+!logs/.gitkeep
+!logs/README.md
+
+# Temporary PHP files / Arquivos temporários PHP
+*.tmp.php
+*.temp.php
+tmp_*.php
+
+# Generated API documentation / Documentação da API gerada
+api-docs/generated/
+
+# Performance monitoring / Monitoramento de performance
+.blackfire.yml
+
+# Composer dependencies / Dependências do Composer
+vendor/
+composer.phar
+composer.lock
+
+# Package manager lock files / Arquivos de lock de gerenciadores
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# IDE workspace files / Arquivos de workspace da IDE
+*.code-workspace
+workspace.xml
+
+# macOS files / Arquivos do macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows files / Arquivos do Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+
+# ============================================================================
+# END OF .gitignore
+# ============================================================================
+
+
+# Database dumps / Dumps de banco de dados
+*.sql
+*.sqlite
+*.db
+
+# Exceptions / Exceções
+!api/vantracing_db.sql
