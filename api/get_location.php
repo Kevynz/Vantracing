@@ -14,14 +14,13 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-cache, no-store, must-revalidate');
 
 require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/auth.php';
 
 try {
-    $driver_id = isset($_GET['driver_id']) ? (int)$_GET['driver_id'] : 0;
-    if ($driver_id <= 0) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Invalid driver_id']);
-        exit;
-    }
+    // For now, only allow the motorista to fetch their own latest location via session
+    // Por ora, apenas o motorista pode obter sua própria localização via sessão
+    ensure_role('motorista');
+    $driver_id = current_user_id();
 
     // Ensure table exists / Garante que a tabela exista
     $createSql = "CREATE TABLE IF NOT EXISTS driver_locations (
@@ -45,7 +44,7 @@ try {
 
     echo json_encode(['success' => true, 'data' => $row]);
 } catch (Throwable $e) {
-    error_log('get_location error: ' . $e->getMessage());
+    log_api('error', 'get_location error: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Server error']);
 }

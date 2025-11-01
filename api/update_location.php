@@ -17,6 +17,7 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-cache, no-store, must-revalidate');
 
 require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/auth.php';
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -25,7 +26,11 @@ try {
         exit;
     }
 
-    $driver_id = isset($_POST['driver_id']) ? (int)$_POST['driver_id'] : 0;
+    // Require authenticated motorista and rate limit 1 req/s
+    ensure_role('motorista');
+    rate_limit('update_location', 1);
+
+    $driver_id = current_user_id();
     $lat = isset($_POST['lat']) ? (float)$_POST['lat'] : null;
     $lng = isset($_POST['lng']) ? (float)$_POST['lng'] : null;
     $accuracy = isset($_POST['accuracy']) ? (float)$_POST['accuracy'] : null;
@@ -63,7 +68,7 @@ try {
 
     echo json_encode(['success' => true]);
 } catch (Throwable $e) {
-    error_log('update_location error: ' . $e->getMessage());
+    log_api('error', 'update_location error: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Server error']);
 }

@@ -1,40 +1,33 @@
 <?php
 require 'db_connect.php';
-header('Content-Type: application/json');
+require_once __DIR__ . '/auth.php';
+header('Content-Type: application/json; charset=utf-8');
 
-// Iniciar sessão para obter o ID do usuário, se necessário.
-// No entanto, é mais seguro passar o ID via POST a partir de dados de sessão do front-end.
-$userId = $_POST['id'] ?? 0;
+ensure_logged_in();
+verify_csrf_token_from_request();
 
-if ($userId <= 0) {
-    echo json_encode(['success' => false, 'msg' => 'ID de usuário inválido.']);
-    exit();
+$userId = (int)($_POST['id'] ?? 0);
+if ($userId <= 0 || $userId !== current_user_id()) {
+    json_response(403, ['success' => false, 'msg' => 'Operação não autorizada para este usuário.']);
 }
 
-// Opcional: verificação de senha para confirmar a exclusão
-// $senha = $_POST['senha'] ?? '';
-// ... (lógica para verificar a senha) ...
-
-$conn->begin_transaction();
-
 try {
-    // A tabela 'criancas' tem ON DELETE CASCADE, então os filhos serão removidos.
+    $conn->beginTransaction();
+
+    // DELETE CASCADE will clean up children in related tables if configured
     $sql = "DELETE FROM usuarios WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
+    $stmt->execute([$userId]);
 
-    if ($stmt->affected_rows > 0) {
+    if ($stmt->rowCount() > 0) {
         $conn->commit();
         echo json_encode(['success' => true, 'msg' => 'Conta excluída com sucesso.']);
     } else {
         throw new Exception('Nenhum usuário encontrado com este ID.');
     }
 } catch (Exception $e) {
-    $conn->rollback();
+    if ($conn->inTransaction()) $conn->rollBack();
+    log_api('error', 'delete_account error: ' . $e->getMessage());
     echo json_encode(['success' => false, 'msg' => 'Erro ao excluir a conta: ' . $e->getMessage()]);
 }
-
-$stmt->close();
-$conn->close();
 ?>

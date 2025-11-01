@@ -67,8 +67,19 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-    const apiUpdateUrl = 'api/update_account.php';
-    const apiDeleteUrl = 'api/delete_account.php';
+        const apiUpdateUrl = 'api/update_account.php';
+        const apiDeleteUrl = 'api/delete_account.php';
+        let csrfToken = null;
+
+        // Fetch CSRF token if available (session-based backends)
+        // Busca token CSRF se disponível (backends com sessão)
+        try {
+            const r = await fetch('api/csrf.php', { cache: 'no-store', credentials: 'include' });
+            if (r.ok) {
+                const j = await r.json();
+                if (j && j.success && j.csrf_token) csrfToken = j.csrf_token;
+            }
+        } catch(_) { /* ignore */ }
 
         // Event listener para o formulário de Alterar Informações
         const updateInfoForm = document.getElementById('updateInfoForm');
@@ -88,8 +99,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('new_name', newName);
                 formData.append('new_email', newEmail);
                 formData.append('current_password', currentPassword);
+                if (csrfToken) formData.append('csrf_token', csrfToken);
 
-                const response = await fetch(apiUpdateUrl, { method: 'POST', body: formData });
+                const response = await fetch(apiUpdateUrl, { method: 'POST', body: formData, credentials: 'include' });
                 const result = await response.json();
                 alert(result.msg);
 
@@ -119,8 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('id', usuarioLogado.id);
                 formData.append('new_password', newPassword);
                 formData.append('current_password', currentPassword);
+                if (csrfToken) formData.append('csrf_token', csrfToken);
 
-                const response = await fetch(apiUpdateUrl, { method: 'POST', body: formData });
+                const response = await fetch(apiUpdateUrl, { method: 'POST', body: formData, credentials: 'include' });
                 const result = await response.json();
                 alert(result.msg);
                 if (result.success) this.reset();
@@ -136,8 +149,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const formData = new FormData();
                     formData.append('id', usuarioLogado.id);
                     formData.append('current_password', confirmation);
+                    if (csrfToken) formData.append('csrf_token', csrfToken);
                     
-                    const response = await fetch(apiDeleteUrl, { method: 'POST', body: formData });
+                    const response = await fetch(apiDeleteUrl, { method: 'POST', body: formData, credentials: 'include' });
                     const result = await response.json();
                     alert(result.msg);
 

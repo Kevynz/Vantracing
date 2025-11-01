@@ -2,6 +2,7 @@
 // ARQUIVO: api/login.php
 
 require 'db_connect.php';
+require_once __DIR__ . '/auth.php';
 header('Content-Type: application/json');
 
 // Função para enviar respostas JSON e terminar o script.
@@ -24,18 +25,11 @@ if (empty($email) || empty($senha)) {
 // Procura o utilizador na tabela principal 'usuarios'
 $sql = "SELECT id, nome, email, role, senha FROM usuarios WHERE email = ?";
 $stmt = $conn->prepare($sql);
-if(!$stmt) {
-    send_json_response(false, ['msg' => 'Erro ao preparar a query de usuário.']);
-}
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows !== 1) {
+$stmt->execute([$email]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$user) {
     send_json_response(false, ['msg' => 'Credenciais inválidas.']);
 }
-
-$user = $result->fetch_assoc();
 
 // Verifica a senha
 if (!password_verify($senha, $user['senha'])) {
@@ -55,19 +49,25 @@ if ($user['role'] === 'responsavel') {
 
 if (!empty($profile_sql)) {
     $stmt_profile = $conn->prepare($profile_sql);
-    $stmt_profile->bind_param("i", $user['id']);
-    $stmt_profile->execute();
-    $profile_result = $stmt_profile->get_result();
-    if ($profile_result->num_rows === 1) {
-        // Adiciona os dados do perfil ao objeto do utilizador
-        $user['profile'] = $profile_result->fetch_assoc();
+    $stmt_profile->execute([$user['id']]);
+    $profile_row = $stmt_profile->fetch(PDO::FETCH_ASSOC);
+    if ($profile_row) {
+        $user['profile'] = $profile_row;
     }
-    $stmt_profile->close();
 }
 
-$stmt->close();
-$conn->close();
+// Start server-side session auth / Inicia sessão autenticada no servidor
+$_SESSION['user_id'] = (int)$user['id'];
+$_SESSION['role'] = (string)$user['role'];
+$_SESSION['nome'] = (string)$user['nome'];
+$_SESSION['email'] = (string)$user['email'];
 
-// Envia a resposta final com todos os dados do utilizador e do seu perfil
-send_json_response(true, ['user' => $user]);
+// Generate CSRF token for subsequent POSTs
+$csrf = generate_csrf_token();
+
+$stmt = null; // release statement
+// PDO connection will be closed by shutdown handler
+
+// Envia a resposta final com todos os dados + csrf_token para o frontend
+send_json_response(true, ['user' => $user, 'csrf_token' => $csrf]);
 ?>
