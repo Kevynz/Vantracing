@@ -4,8 +4,8 @@
 ## Quick Setup / Configuração Rápida
 
 ### 1. Copy .env.example to .env / Copie .env.example para .env
-```bash
-cp .env.example .env
+```powershell
+copy .env.example .env
 ```
 
 ### 2. Edit .env with your credentials / Edite .env com suas credenciais
@@ -21,15 +21,22 @@ DB_PASSWORD=your_password
 CREATE DATABASE vantracing_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### 4. Import database schema / Importe o esquema do banco de dados
-```bash
-mysql -u your_username -p vantracing_db < api/vantracing_db.sql
+### 4. Apply database migrations / Aplique as migrações do banco
+```powershell
+mysql -u your_username -p vantracing_db < database/migrations/001_init.sql
+mysql -u your_username -p vantracing_db < database/migrations/002_profile_split.sql
 ```
 
-### 5. Set file permissions / Configure as permissões
-```bash
-chmod -R 755 .
-chmod -R 775 api/
+### 5. Run locally / Execute localmente
+- Frontend (static):
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\serve.ps1 -Port 5500
+# open http://localhost:5500
+```
+- APIs (PHP built-in):
+```powershell
+php -S localhost:8000 -t .
+# APIs at http://localhost:8000/api/...
 ```
 
 ### 6. Access the application / Acesse a aplicação
@@ -43,13 +50,11 @@ Navigate to: http://localhost/Vantracing
 - Check user permissions / Verifique permissões do usuário
 
 ### File permission issues / Problemas de permissão de arquivos
+- Windows: Execute o terminal como Administrador
+- Linux/macOS:
 ```bash
-# Linux/macOS
 sudo chown -R www-data:www-data .
 sudo chmod -R 755 .
-
-# Windows: Run as administrator
-# Execute como administrador
 ```
 
 ### Blank page or errors / Página em branco ou erros

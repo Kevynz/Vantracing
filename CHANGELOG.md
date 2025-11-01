@@ -27,6 +27,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Template .env.example para implantações de terceiros
 - 💬 **Bilingual code comments** throughout the project
   - Comentários de código bilíngues em todo o projeto
+ - 🗺️ **Session-based real-time tracking** endpoints (`api/update_location.php`, `api/get_location.php`)
+   - Rastreamento em tempo real baseado em sessão
+ - 🔄 **Location sharing toggle** on driver UI with status badge
+   - Botão de alternância para compartilhamento de localização com status
+ - 🧭 **Leaflet map integration** with polling and local fallback
+   - Integração com Leaflet com polling e fallback local
+ - 🧱 **SQL migrations** (`database/migrations/001_init.sql`, `002_profile_split.sql`)
+   - Migrações SQL
 
 ### Changed / Alterado
 - 🔧 **Refactored database connection** to use environment variables
@@ -37,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Documentação JavaScript melhorada com comentários JSDoc
 - 🎯 **Standardized file naming** (estilo.css consistency)
   - Padronização de nomes de arquivos
+ - 🔐 **Secured APIs to session-based auth** with role checks
+   - APIs protegidas por sessões com verificação de papéis
 
 ### Security / Segurança
 - 🛡️ **Removed hardcoded credentials** from source code
@@ -47,6 +57,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Implementado .gitignore adequado para prevenir vazamento de credenciais
 - 🔒 **Enhanced error logging** without exposing sensitive data
   - Registro de erros aprimorado sem expor dados sensíveis
+ - 🧪 **CSRF protection implemented** (`api/csrf.php`)
+   - Proteção CSRF implementada
+ - ⏱️ **API rate limiting** for `update_location` (1 req/s per session)
+   - Limitação de taxa para `update_location` (1 req/s por sessão)
+ - 🧾 **API logging** with correlation IDs to `logs/api.log`
+   - Logs de API com correlation IDs em `logs/api.log`
 
 ### Documentation / Documentação
 - 📚 **Added comprehensive README.md** with:
@@ -108,8 +124,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Version 2.1 (Planned / Planejado)
 - [ ] Update all HTML pages with i18n attributes
 - [ ] Add email notification system
-- [ ] Implement CSRF token protection
-- [ ] Add API rate limiting
+- [ ] Implement CSRF token protection (Completed in 2.0.0)
+- [ ] Add API rate limiting (Completed in 2.0.0)
 - [ ] Create automated tests
 
 ### Version 2.5 (Planned / Planejado)

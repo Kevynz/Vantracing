@@ -36,15 +36,15 @@
 ## 🛠️ Technologies / Tecnologias
 
 ### Frontend
-- **HTML5, CSS3, JavaScript (ES6+)**
-- **Bootstrap 5.3** - UI framework / Framework de interface
-- **Font Awesome 6.4** - Icons / Ícones
-- **Google Material Icons** - Additional icons / Ícones adicionais
+- HTML5, CSS3 (Bootstrap 5), JavaScript ES6
+- Leaflet + OpenStreetMap for maps / Leaflet + OpenStreetMap para mapas
+- Fetch API with credentials for session-based calls / Fetch API com credenciais para chamadas baseadas em sessão
 
 ### Backend
 - **PHP 7.4+** - Server-side logic / Lógica do servidor
 - **MySQL 8.0+** - Database / Banco de dados
 - **PDO** - Database abstraction / Abstração de banco de dados
+- **Sessions + CSRF** - Server-authenticated APIs with CSRF tokens / APIs autenticadas por sessão com tokens CSRF
 
 ### APIs & Services / APIs e Serviços
 - **Geolocation API** - Location tracking / Rastreamento de localização
@@ -57,119 +57,47 @@
 Before you begin, ensure you have the following installed:
 Antes de começar, certifique-se de ter o seguinte instalado:
 
-- **Web Server**: Apache 2.4+ or Nginx 1.18+
-- **PHP**: 7.4 or higher
-- **MySQL**: 8.0 or higher
-- **Composer** (optional, for future dependency management)
-
----
+- Web Server: Apache 2.4+ or Nginx 1.18+ (or use PHP built-in for dev)
+- PHP: 7.4 or higher / 7.4 ou superior
+- MySQL: 8.0 or higher / 8.0 ou superior
+- Modern browser / Navegador moderno
 
 ## 🚀 Installation / Instalação
 
-### 1. Clone the Repository / Clone o Repositório
-
-```bash
-git clone https://github.com/Kevynz/Vantracing.git
-cd Vantracing
+1) Copy .env template / Copie o template .env
+```powershell
+copy .env.example .env
 ```
 
-### 2. Database Setup / Configuração do Banco de Dados
-
-1. Create a new MySQL database:
-   Crie um novo banco de dados MySQL:
-
-```sql
-CREATE DATABASE vantracing_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-2. Import the database schema:
-   Importe o esquema do banco de dados:
-
-```bash
-mysql -u your_username -p vantracing_db < api/vantracing_db.sql
-```
-
-### 3. Environment Configuration / Configuração do Ambiente
-
-1. Copy the example environment file:
-   Copie o arquivo de exemplo de ambiente:
-
-```bash
-cp .env.example .env
-```
-
-2. Edit `.env` with your database credentials:
-   Edite `.env` com suas credenciais do banco de dados:
-
+2) Edit `.env` with your credentials / Edite `.env` com suas credenciais
 ```env
 DB_HOST=localhost
 DB_NAME=vantracing_db
 DB_USER=your_username
 DB_PASSWORD=your_password
-DB_CHARSET=utf8mb4
 ```
 
-### 4. Web Server Configuration / Configuração do Servidor Web
-
-#### Apache
-
-Ensure `mod_rewrite` is enabled and create a virtual host:
-Certifique-se de que `mod_rewrite` está habilitado e crie um host virtual:
-
-```apache
-<VirtualHost *:80>
-    ServerName vantracing.local
-    DocumentRoot /path/to/Vantracing
-    
-    <Directory /path/to/Vantracing>
-        Options Indexes FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-    
-    ErrorLog ${APACHE_LOG_DIR}/vantracing_error.log
-    CustomLog ${APACHE_LOG_DIR}/vantracing_access.log combined
-</VirtualHost>
+3) Create database (if needed) / Crie o banco (se necessário)
+```sql
+CREATE DATABASE IF NOT EXISTS vantracing_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-#### Nginx
-
-```nginx
-server {
-    listen 80;
-    server_name vantracing.local;
-    root /path/to/Vantracing;
-    index index.html index.php;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
-    }
-
-    location ~ /\.ht {
-        deny all;
-    }
-}
+4) Apply migrations (in order) / Aplique as migrações (na ordem)
+```powershell
+mysql -u your_username -p vantracing_db < database/migrations/001_init.sql
+mysql -u your_username -p vantracing_db < database/migrations/002_profile_split.sql
 ```
 
-### 5. File Permissions / Permissões de Arquivos
-
-Set appropriate permissions:
-Defina as permissões apropriadas:
-
-```bash
-# For Linux/macOS
-chmod -R 755 .
-chmod -R 775 api/
-chown -R www-data:www-data .
-
-# Create upload directories if needed
-mkdir -p uploads/avatars
-chmod -R 775 uploads/
+5) Run locally / Executar localmente
+- Frontend (static server):
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\serve.ps1 -Port 5500
+# open http://localhost:5500
+```
+- APIs (PHP built-in server):
+```powershell
+php -S localhost:8000 -t .
+# APIs at http://localhost:8000/api/...
 ```
 
 ---
@@ -217,8 +145,10 @@ chmod -R 775 uploads/
 - ✅ **Password Hashing**: Using `password_hash()` with bcrypt / Usando `password_hash()` com bcrypt
 - ✅ **SQL Injection Prevention**: Prepared statements with PDO / Prevenção de injeção SQL com PDO
 - ✅ **XSS Protection**: Input sanitization and output escaping / Proteção XSS e sanitização de entrada
-- ✅ **CSRF Protection**: Token validation (to be implemented) / Validação de token (a ser implementado)
-- ✅ **Secure Sessions**: HTTPOnly and Secure cookie flags / Flags de cookie HTTPOnly e Secure
+- ✅ **CSRF Protection**: Token validation implemented (`api/csrf.php`) / Validação de token implementada
+- ✅ **Session-based Auth**: Server-validated id/role on protected endpoints / Sessões com id/papel validados no servidor
+- ✅ **Rate Limiting**: Applied on `update_location` (1 req/s per session) / Aplicado em `update_location` (1 req/s por sessão)
+- ✅ **API Logging**: File logs with correlation IDs in `logs/api.log` / Logs em arquivo com correlation IDs em `logs/api.log`
 - ✅ **Environment Variables**: Sensitive data not in source code / Dados sensíveis não no código-fonte
 
 ### Recommendations / Recomendações
@@ -254,44 +184,52 @@ Os usuários podem alternar manualmente os idiomas usando o botão de troca de i
 
 ```
 Vantracing/
-├── api/                      # Backend PHP scripts / Scripts PHP do backend
-│   ├── db_connect.php       # Database connection / Conexão com banco de dados
-│   ├── login.php            # Login endpoint
-│   ├── register.php         # Registration endpoint / Endpoint de registro
-│   ├── get_children.php     # Get children list / Listar crianças
-│   ├── register_child.php   # Add child / Adicionar criança
-│   ├── delete_child.php     # Delete child / Excluir criança
-│   ├── get_perfil.php       # Get profile / Obter perfil
-│   ├── update_perfil.php    # Update profile / Atualizar perfil
-│   ├── update_account.php   # Update account / Atualizar conta
-│   ├── delete_account.php   # Delete account / Excluir conta
-│   ├── request_reset.php    # Password reset request / Solicitação de redefinição de senha
-│   ├── do_reset.php         # Execute password reset / Executar redefinição de senha
-│   └── vantracing_db.sql    # Database schema / Esquema do banco de dados
-├── css/                      # Stylesheets
-│   └── i18n.css             # Internationalization styles / Estilos de internacionalização
-├── JavaScript/               # Frontend scripts
-│   ├── geral.js             # General utilities / Utilitários gerais
-│   ├── i18n.js              # Internationalization / Internacionalização
-│   ├── perfil-motorista.js  # Driver profile logic / Lógica do perfil do motorista
-│   └── perfil-responsavel.js # Guardian profile logic / Lógica do perfil do responsável
-├── img/                      # Images and assets / Imagens e recursos
-├── cadastro.html            # Registration page / Página de cadastro
-├── dashboard.html           # Main dashboard / Painel principal
-├── historico-rotas.html     # Route history / Histórico de rotas
-├── index.html               # Login page / Página de login
-├── motorista.html           # Driver registration / Cadastro de motorista
-├── nova-senha.html          # New password page / Página de nova senha
-├── perfil.html              # Profile page / Página de perfil
-├── perfilmotorista.html     # Driver profile / Perfil do motorista
-├── perfilreponsável.html    # Guardian profile / Perfil do responsável
-├── reset-senha.html         # Password reset / Redefinição de senha
-├── responsavel.html         # Guardian registration / Cadastro de responsável
-├── rota-tempo-real.html     # Real-time tracking / Rastreamento em tempo real
-├── estilo.css               # Main stylesheet / Folha de estilo principal
-├── .env.example             # Environment variables template / Modelo de variáveis de ambiente
-├── .gitignore               # Git ignore file / Arquivo de ignore do Git
-└── README.md                # This file / Este arquivo
+├── api/                       # Backend PHP scripts / Scripts PHP do backend
+│   ├── auth.php              # Session/CSRF/RateLimit helpers / Helpers de sessão/CSRF/Rate Limit
+│   ├── csrf.php              # CSRF token endpoint
+│   ├── db_connect.php        # Database connection / Conexão com banco de dados
+│   ├── login.php             # Login endpoint
+│   ├── register.php          # Registration endpoint / Endpoint de registro
+│   ├── get_children.php      # Get children list / Listar crianças
+│   ├── register_child.php    # Add child / Adicionar criança
+│   ├── delete_child.php      # Delete child / Excluir criança
+│   ├── get_perfil.php        # Get profile / Obter perfil
+│   ├── update_perfil.php     # Update profile / Atualizar perfil
+│   ├── update_account.php    # Update account / Atualizar conta
+│   ├── delete_account.php    # Delete account / Excluir conta
+│   ├── request_reset.php     # Password reset request / Solicitação de redefinição de senha
+│   ├── do_reset.php          # Execute password reset / Executar redefinição de senha
+│   ├── update_location.php   # Update driver location (session) / Atualizar localização (sessão)
+│   └── get_location.php      # Get driver location (session) / Obter localização (sessão)
+├── css/                       # Stylesheets
+│   └── i18n.css              # Internationalization styles / Estilos de internacionalização
+├── JavaScript/                # Frontend scripts
+│   ├── geral.js              # General utilities / Utilitários gerais
+│   ├── i18n.js               # Internationalization / Internacionalização
+│   ├── perfil-motorista.js   # Driver profile logic / Lógica do perfil do motorista
+│   ├── perfil-responsavel.js # Guardian profile logic / Lógica do responsável
+│   └── tracking.js           # Real-time tracking logic / Lógica de rastreamento
+├── database/
+│   └── migrations/           # SQL migrations (idempotent) / Migrações SQL (idempotentes)
+├── img/                       # Images and assets / Imagens e recursos
+├── logs/                      # API/application logs / Logs da aplicação
+├── cadastro.html             # Registration page / Página de cadastro
+├── dashboard.html            # Main dashboard / Painel principal
+├── historico-rotas.html      # Route history / Histórico de rotas
+├── index.html                # Login page / Página de login
+├── motorista.html            # Driver registration / Cadastro de motorista
+├── nova-senha.html           # New password page / Página de nova senha
+├── perfil.html               # Profile page / Página de perfil
+├── perfilmotorista.html      # Driver profile / Perfil do motorista
+├── perfilreponsável.html     # Guardian profile / Perfil do responsável
+├── reset-senha.html          # Password reset / Redefinição de senha
+├── responsavel.html          # Guardian registration / Cadastro de responsável
+├── rota-tempo-real.html      # Real-time tracking / Rastreamento em tempo real
+├── estilo.css                # Main stylesheet / Folha de estilo principal
+├── serve.ps1                 # Static dev server (PowerShell) / Servidor estático de dev
+├── .env.example              # Environment variables template / Modelo de variáveis de ambiente
+├── .gitignore                # Git ignore file / Arquivo de ignore do Git
+└── README.md                 # This file / Este arquivo
 ```
 
 ---
