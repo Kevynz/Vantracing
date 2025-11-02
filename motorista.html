@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main stylesheet / Estilo principal -->
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <!-- Favicon & theme color -->
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+</head>
+<body>
+    <div class="container mt-5 pt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body text-center p-5">
+                        <img src="img/perfil.png" class="rounded-circle mb-3" width="100" alt="Avatar">
+                        <h2 class="mb-4" data-i18n="driver">Motorista</h2>
+                        <div class="mb-3">
+                            <span class="badge bg-secondary" id="share-status">Compartilhamento: desligado</span>
+                            <button id="share-toggle" type="button" class="btn btn-outline-primary ms-2">Iniciar compartilhamento</button>
+                        </div>
+                        <form id="cadastroForm" novalidate>
+                            <div class="mb-3">
+                                <label for="cadastro-nome" class="form-label" data-i18n="name">Nome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-nome" data-i18n-placeholder="namePlaceholder" placeholder="Digite seu nome" required>
+                                <div class="invalid-feedback">
+                                    Digite um nome válido.
+                                </div>
+                            <div class="mb-3">
+                                <label for="cadastro-email" class="form-label">E-mail <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="cadastro-email" placeholder="Digite seu e-mail" required>
+                                <div class="invalid-feedback">
+                                    Digite um e-mail válido.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-cpf" class="form-label">CPF <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-cpf" placeholder="Digite seu CPF (apenas números)" maxlength="14" required>
+                                <div class="invalid-feedback">
+                                    Digite um CPF válido.
+                                </div>
+                                <!-- Div para feedback de validação do CPF -->
+                                <div id="cpf-feedback" class="cpf-feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cadastro-cnh" class="form-label">CNH <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-cnh" placeholder="Digite sua CNH (apenas números)" maxlength="11" required>
+                                <div class="invalid-feedback">
+                                    Digite uma CNH válida.
+                                </div>
+                                <!-- Div para feedback de validação da CNH -->
+                                <div id="cnh-feedback" class="cnh-feedback"></div>
+                              </div>
+                            <div class="mb-3">
+                                <label for="cadastro-nascimento" class="form-label">Data de Nascimento <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="cadastro-nascimento" required>
+                                <div class="invalid-feedback">
+                                    Selecione uma data de nascimento válida.
+                                </div>
+                                <!-- Div para feedback de validação da data de nascimento -->
+                                <div id="nascimento-feedback" class="nascimento-feedback"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-senha" class="form-label">Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="cadastro-senha" placeholder="Digite sua senha" required>
+                                <!-- Div para feedback de força da senha -->
+                                <div id="senha-feedback" class="senha-feedback"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-confirma-senha" class="form-label">Confirmar Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="cadastro-confirma-senha" placeholder="Confirme sua senha" required>
+                                <!-- Div para feedback de coincidência de senhas -->
+                                <div id="confirma-senha-feedback" class="confirma-senha-feedback"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" data-i18n="registerButton">CADASTRAR</button>
+                            <p data-i18n="alreadyHaveAccount">Já tem uma conta? <a href="index.html" data-i18n="loginLink">Logar</a></p>
+                            <p data-i18n="isGuardian">É responsável ? <a href="responsavel.html" data-i18n="guardianRegister">Cadastro Responsável</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle com Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="JavaScript/i18n.js"></script>
+    <!-- JavaScript geral -->
+    <script src="JavaScript/geral.js"></script>
+        <!-- Tracking logic: share driver's location -->
+        <script src="JavaScript/tracking.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const statusEl = document.getElementById('share-status');
+                const btn = document.getElementById('share-toggle');
+                function refreshUI(){
+                    const on = typeof getSharingStatus === 'function' ? getSharingStatus() : false;
+                    statusEl.textContent = on ? 'Compartilhamento: ligado' : 'Compartilhamento: desligado';
+                    btn.textContent = on ? 'Parar compartilhamento' : 'Iniciar compartilhamento';
+                    btn.classList.toggle('btn-outline-danger', on);
+                    btn.classList.toggle('btn-outline-primary', !on);
+                }
+                btn.addEventListener('click', ()=>{
+                    const on = typeof getSharingStatus === 'function' ? getSharingStatus() : false;
+                    if (on) { if (typeof disableSharing==='function') disableSharing(); }
+                    else { if (typeof enableSharing==='function') enableSharing(); }
+                    if (typeof initDriverTracking === 'function' && !on) initDriverTracking();
+                    refreshUI();
+                });
+                refreshUI();
+            });
+        </script>
+    <!-- Ícones do Material Design (necessários para o botão de troca de tema) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Script do tema já incluso acima / Theme script already included above -->
+</body>
+</html>

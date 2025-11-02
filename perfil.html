@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecionando...</title>
+    <script>
+        // Este arquivo irá redirecionar o usuário para a página de perfil correta.
+        document.addEventListener('DOMContentLoaded', function() {
+            const usuario = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+
+            if (!usuario) {
+                window.location.href = 'index.html'; // Se não estiver logado, vai para o login
+                return;
+            }
+
+            if (usuario.role === 'responsavel') {
+                window.location.href = 'perfilreponsável.html';
+            } else if (usuario.role === 'motorista') {
+                window.location.href = 'perfilmotorista.html';
+            } else {
+                // Fallback ou página de erro
+                alert('Tipo de usuário desconhecido!');
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</head>
+<body>
+    <p>Aguarde, estamos preparando seu perfil...</p>
+</body>
+</html>
