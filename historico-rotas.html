@@ -17,6 +17,231 @@
     <meta name="theme-color" content="#0d6efd">
 </head>
 <body>
+    <div class="container mt-5 pt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body text-center p-5">
+                        <img src="img/perfil.png" class="rounded-circle mb-3" width="100" alt="Avatar">
+                        <h2 class="mb-4" data-i18n="register">Cadastro</h2>
+                        <form id="cadastroForm" novalidate>
+                            <div class="mb-3">
+                                <label for="cadastro-email" class="form-label" data-i18n="email">E-mail <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="cadastro-email" data-i18n-placeholder="emailPlaceholder" placeholder="Digite seu e-mail" required>
+                                <div class="invalid-feedback" data-i18n="invalidEmail">
+                                    Digite um e-mail válido.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-senha" class="form-label" data-i18n="password">Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="cadastro-senha" data-i18n-placeholder="passwordPlaceholder" placeholder="Digite sua senha" required>
+                                <!-- Div para feedback de força da senha -->
+                                <div id="senha-feedback" class="senha-feedback"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-confirma-senha" class="form-label" data-i18n="confirmPassword">Confirmar Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="cadastro-confirma-senha" data-i18n-placeholder="confirmPasswordPlaceholder" placeholder="Confirme sua senha" required>
+                                <!-- Div para feedback de coincidência de senhas -->
+                                <div id="confirma-senha-feedback" class="confirma-senha-feedback"></div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label" data-i18n="chooseRole">Escolha seu papel: <span class="text-danger">*</span></label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="role" id="role-responsavel" checked required>
+                                    <label class="btn btn-outline-primary" for="role-responsavel" data-i18n="guardian">Responsável</label>
+                                    <input type="radio" class="btn-check" name="role" id="role-motorista" required>
+                                    <label class="btn btn-outline-primary" for="role-motorista" data-i18n="driver">Motorista</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" data-i18n="registerButton">CADASTRAR</button>
+                            <p data-i18n="alreadyHaveAccount">Já tem uma conta? <a href="index.html" data-i18n="loginLink">Logar</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle com Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="js/i18n.js"></script>
+    <!-- JavaScript geral -->
+    <script src="js/geral.js"></script>
+    <!-- Ícones do Material Design (necessários para o botão de troca de tema) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Material Icons -->
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main stylesheet / Estilo principal -->
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <!-- Favicon & theme color -->
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+</head>
+<body>
+    <!-- Barra de Navegação Principal -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard.html">VanTracing</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="dashboard.html" data-i18n="dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="perfil.html" data-i18n="profile">Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="rota-tempo-real.html" data-i18n="realTimeTracking">Rota em Tempo Real</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="historico-rotas.html" data-i18n="routeHistory">Histórico de Rotas</a>
+                    </li>
+                </ul>
+                <button id="logout-btn" class="btn btn-outline-light" data-i18n="logout">Sair</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-5">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4" data-i18n="dashboard">Dashboard</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <i class="fas fa-car fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Rotas Ativas</h5>
+                        <p class="card-text display-6">2</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <i class="fas fa-history fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Rotas Concluídas</h5>
+                        <p class="card-text display-6">28</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Tempo Médio</h5>
+                        <p class="card-text display-6">18m</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <i class="fas fa-map-marker-alt fa-3x text-danger mb-3"></i>
+                        <h5 class="card-title">Destinos</h5>
+                        <p class="card-text display-6">5</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">Próximas Rotas</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Casa → Escola
+                                <span class="badge bg-primary rounded-pill">8:00</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Escola → Casa
+                                <span class="badge bg-primary rounded-pill">12:30</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Casa → Aula de Música
+                                <span class="badge bg-primary rounded-pill">15:00</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">Motoristas Disponíveis</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Wallace Sena
+                                <span class="badge bg-success rounded-pill">Online</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Carla Andersan
+                                <span class="badge bg-success rounded-pill">Online</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Lil Johan
+                                <span class="badge bg-secondary rounded-pill">Offline</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle com Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="js/i18n.js"></script>
+    <!-- Ícones do Material Design (necessários para o botão de troca de tema) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- JavaScript geral -->
+    <script src="js/geral.js"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main stylesheet / Estilo principal -->
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <!-- Favicon & theme color -->
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+</head>
+<body>
     <!-- Barra de Navegação Principal -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
         <div class="container-fluid">
@@ -29,10 +254,994 @@
     <!-- Bootstrap JS Bundle com Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
-    <script src="JavaScript/i18n.js"></script>
+    <script src="js/i18n.js"></script>
     <!-- Ícones do Material Design (necessários para o botão de troca de tema) -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <!-- JavaScript geral -->
-    <script src="JavaScript/geral.js"></script>
+    <script src="js/geral.js"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="login">VanTracing - Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para ícones / Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Main Stylesheet / Folha de estilo principal -->
+    <link rel="stylesheet" href="estilo.css">
+    <!-- Internationalization Styles / Estilos de internacionalização -->
+    <link rel="stylesheet" href="css/i18n.css">
+</head>
+<body>
+    <div class="container mt-5 pt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body text-center p-5">
+                        <img src="img/perfil.png" class="rounded-circle mb-3" width="100" alt="Avatar">
+                        <h2 class="mb-4" data-i18n="login">Login</h2>
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="login-email" class="form-label" data-i18n="email">E-mail</label>
+                                <input type="email" class="form-control" id="login-email" data-i18n="enterEmail" placeholder="Digite seu e-mail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="login-senha" class="form-label" data-i18n="password">Senha</label>
+                                <input type="password" class="form-control" id="login-senha" data-i18n="enterPassword" placeholder="Digite sua senha" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" data-i18n="loginButton">ENTRAR</button>
+                            <p><span data-i18n="noAccount">Ainda não tem uma conta?</span><br>
+                            <a href="motorista.html" data-i18n="driver">Motorista</a> | 
+                            <a href="responsavel.html" data-i18n="guardian">Responsável</a></p>
+                            <p><span data-i18n="forgotPassword">Esqueceu a senha?</span> 
+                            <a href="reset-senha.html" data-i18n="changePassword">Trocar senha</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper / Bootstrap JS Bundle com Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Internationalization Module / Módulo de internacionalização -->
+    <script src="js/i18n.js"></script>
+    <!-- General JavaScript / JavaScript geral -->
+    <script src="js/geral.js"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main stylesheet / Estilo principal -->
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <!-- Favicon & theme color -->
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+</head>
+<body>
+    <div class="container mt-5 pt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body text-center p-5">
+                        <img src="img/perfil.png" class="rounded-circle mb-3" width="100" alt="Avatar">
+                        <h2 class="mb-4" data-i18n="driver">Motorista</h2>
+                        <div class="mb-3">
+                            <span class="badge bg-secondary" id="share-status">Compartilhamento: desligado</span>
+                            <button id="share-toggle" type="button" class="btn btn-outline-primary ms-2">Iniciar compartilhamento</button>
+                        </div>
+                        <form id="cadastroForm" novalidate>
+                            <div class="mb-3">
+                                <label for="cadastro-nome" class="form-label" data-i18n="name">Nome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-nome" data-i18n-placeholder="namePlaceholder" placeholder="Digite seu nome" required>
+                                <div class="invalid-feedback">
+                                    Digite um nome válido.
+                                </div>
+                            <div class="mb-3">
+                                <label for="cadastro-email" class="form-label">E-mail <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="cadastro-email" placeholder="Digite seu e-mail" required>
+                                <div class="invalid-feedback">
+                                    Digite um e-mail válido.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-cpf" class="form-label">CPF <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-cpf" placeholder="Digite seu CPF (apenas números)" maxlength="14" required>
+                                <div class="invalid-feedback">
+                                    Digite um CPF válido.
+                                </div>
+                                <!-- Div para feedback de validação do CPF -->
+                                <div id="cpf-feedback" class="cpf-feedback"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="cadastro-cnh" class="form-label">CNH <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-cnh" placeholder="Digite sua CNH (apenas números)" maxlength="11" required>
+                                <div class="invalid-feedback">
+                                    Digite uma CNH válida.
+                                </div>
+                                <!-- Div para feedback de validação da CNH -->
+                                <div id="cnh-feedback" class="cnh-feedback"></div>
+                              </div>
+                            <div class="mb-3">
+                                <label for="cadastro-nascimento" class="form-label">Data de Nascimento <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="cadastro-nascimento" required>
+                                <div class="invalid-feedback">
+                                    Selecione uma data de nascimento válida.
+                                </div>
+                                <!-- Div para feedback de validação da data de nascimento -->
+                                <div id="nascimento-feedback" class="nascimento-feedback"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-senha" class="form-label">Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="cadastro-senha" placeholder="Digite sua senha" required>
+                                <!-- Div para feedback de força da senha -->
+                                <div id="senha-feedback" class="senha-feedback"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-confirma-senha" class="form-label">Confirmar Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="cadastro-confirma-senha" placeholder="Confirme sua senha" required>
+                                <!-- Div para feedback de coincidência de senhas -->
+                                <div id="confirma-senha-feedback" class="confirma-senha-feedback"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" data-i18n="registerButton">CADASTRAR</button>
+                            <p data-i18n="alreadyHaveAccount">Já tem uma conta? <a href="index.html" data-i18n="loginLink">Logar</a></p>
+                            <p data-i18n="isGuardian">É responsável ? <a href="responsavel.html" data-i18n="guardianRegister">Cadastro Responsável</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle com Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="js/i18n.js"></script>
+    <!-- JavaScript geral -->
+    <script src="js/geral.js"></script>
+        <!-- Tracking logic: share driver's location -->
+        <script src="js/tracking.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const statusEl = document.getElementById('share-status');
+                const btn = document.getElementById('share-toggle');
+                function refreshUI(){
+                    const on = typeof getSharingStatus === 'function' ? getSharingStatus() : false;
+                    statusEl.textContent = on ? 'Compartilhamento: ligado' : 'Compartilhamento: desligado';
+                    btn.textContent = on ? 'Parar compartilhamento' : 'Iniciar compartilhamento';
+                    btn.classList.toggle('btn-outline-danger', on);
+                    btn.classList.toggle('btn-outline-primary', !on);
+                }
+                btn.addEventListener('click', ()=>{
+                    const on = typeof getSharingStatus === 'function' ? getSharingStatus() : false;
+                    if (on) { if (typeof disableSharing==='function') disableSharing(); }
+                    else { if (typeof enableSharing==='function') enableSharing(); }
+                    if (typeof initDriverTracking === 'function' && !on) initDriverTracking();
+                    refreshUI();
+                });
+                refreshUI();
+            });
+        </script>
+    <!-- Ícones do Material Design (necessários para o botão de troca de tema) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Script do tema já incluso acima / Theme script already included above -->
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing - Nova Senha</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+    <div class="container mt-5 pt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body text-center p-5">
+                        <h2 class="mb-4" data-i18n="resetPassword">Crie sua Nova Senha</h2>
+                        <form id="novaSenhaForm">
+                            <input type="hidden" id="reset-email-hidden">
+                            
+                            <div class="mb-3">
+                                <label for="reset-code" class="form-label">Código de Verificação</label>
+                                <input type="text" class="form-control" id="reset-code" placeholder="Código recebido por e-mail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="new-password" class="form-label" data-i18n="newPassword">Nova Senha</label>
+                                <input type="password" class="form-control" id="new-password" placeholder="Mínimo de 8 caracteres" required>
+                            </div>
+                             <div class="mb-3">
+                                <label for="confirm-password" class="form-label" data-i18n="confirmPassword">Confirmar Nova Senha</label>
+                                <input type="password" class="form-control" id="confirm-password" placeholder="Repita a nova senha" required>
+                            </div>
+                            <div id="feedback" class="mb-3"></div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" data-i18n="save">Salvar Nova Senha</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="js/i18n.js"></script>
+    <script src="js/geral.js"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing - Perfil do Motorista</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        .profile-section { display: none; }
+        .profile-section.active { display: block; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="./dashboard.html">VanTracing</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="./dashboard.html">Dashboard</a></li>
+                    <li class="nav-item"><a id="perfil-link" class="nav-link active" href="./perfilmotorista.html">Perfil</a></li>
+                </ul>
+                <button id="logout-btn" class="btn btn-outline-light">Sair</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-5">
+        <div id="test-banner" class="alert alert-success d-none" role="alert" style="position:sticky; top:4rem; z-index: 1020;">
+            Modo de teste ativo (debug). Nenhuma chamada sensível será realizada.
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <h4 id="user-nome-display">Carregando...</h4>
+                    </div>
+                </div>
+                <div class="list-group mb-4">
+                    <a href="#" data-section="info-section" class="list-group-item list-group-item-action active" data-i18n="myInfo">Minhas Informações</a>
+                    <a href="#" data-section="seguranca-section" class="list-group-item list-group-item-action" data-i18n="security">Segurança</a>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div id="info-section" class="profile-section active">
+                    <div class="card">
+                        <div class="card-header"><h4 class="mb-0" data-i18n="driverData">Dados do Motorista</h4></div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label for="motorista-cpf" class="form-label" data-i18n="cpf">CPF</label>
+                                    <input type="text" id="motorista-cpf" class="form-control" readonly disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="motorista-cnh" class="form-label" data-i18n="cnh">CNH</label>
+                                    <input type="text" id="motorista-cnh" class="form-control" readonly disabled>
+                                </div>
+                                <small class="form-text text-muted">Para alterar estes dados, por favor, entre em contato com o suporte.</small>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="seguranca-section" class="profile-section">
+                     <div class="card">
+                        <div class="card-header"><h4 class="mb-0" data-i18n="accountSecurity">Segurança da Conta</h4></div>
+                        <div class="card-body">
+                            <form id="updateInfoForm" class="mb-5">
+                                <h5 data-i18n="changeInfo">Alterar Informações</h5>
+                                <div class="mb-3">
+                                    <label for="new-name" class="form-label" data-i18n="fullName">Nome Completo</label>
+                                    <input type="text" class="form-control" id="new-name" placeholder="Seu nome completo">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-email" class="form-label" data-i18n="email">E-mail</label>
+                                    <input type="email" class="form-control" id="new-email" placeholder="Seu novo e-mail">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="info-current-password" class="form-label" data-i18n="currentPassword">Senha Atual (para confirmar)</label>
+                                    <input type="password" class="form-control" id="info-current-password" required placeholder="Digite sua senha atual">
+                                </div>
+                                <button type="submit" class="btn btn-primary" data-i18n="saveInfo">Salvar Informações</button>
+                            </form>
+                            <hr>
+                            <form id="updatePasswordForm" class="mb-5">
+                                <h5 data-i18n="changePassword">Alterar Senha</h5>
+                                <div class="mb-3">
+                                    <label for="pass-current-password" class="form-label" data-i18n="currentPassword">Senha Atual</label>
+                                    <input type="password" class="form-control" id="pass-current-password" required placeholder="Digite sua senha atual">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-password" class="form-label" data-i18n="newPassword">Nova Senha</label>
+                                    <input type="password" class="form-control" id="new-password" required placeholder="Mínimo 8 caracteres">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirm-new-password" class="form-label" data-i18n="confirmNewPassword">Confirmar Nova Senha</label>
+                                    <input type="password" class="form-control" id="confirm-new-password" required placeholder="Repita a nova senha">
+                                </div>
+                                <button type="submit" class="btn btn-primary" data-i18n="changePassword">Alterar Senha</button>
+                            </form>
+                            <hr>
+                            <div class="p-3 border border-danger rounded">
+                                <p>A exclusão da sua conta é uma ação irreversível e removerá todos os seus dados.</p>
+                                <button id="delete-account-btn" class="btn btn-danger" data-i18n="deleteAccount">Excluir Minha Conta</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="js/i18n.js"></script>
+    <script src="js/geral.js"></script>
+    <script src="js/perfil-motorista.js"></script>
+        <script>
+            (function(){
+                const p = new URLSearchParams(location.search);
+                if ((p.get('debug') === '1' || p.get('mock') === '1') && location.hostname === 'localhost') {
+                    const b = document.getElementById('test-banner');
+                    if (b) b.classList.remove('d-none');
+                }
+            })();
+        </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing - Perfil do Responsável</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        .profile-section { display: none; }
+        .profile-section.active { display: block; }
+        .date-selects { display: flex; gap: 10px; }
+        .date-selects .form-select { flex: 1; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="./dashboard.html">VanTracing</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="./dashboard.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="./perfil.html">Perfil</a></li>
+                </ul>
+                <button id="logout-btn" class="btn btn-outline-light">Sair</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-5">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <h4 id="user-nome-display">A carregar...</h4>
+                    </div>
+                </div>
+                <div class="list-group mb-4">
+                    <a href="#" data-section="criancas-section" class="list-group-item list-group-item-action active">Gerir Crianças</a>
+                    <a href="#" data-section="seguranca-section" class="list-group-item list-group-item-action">Segurança</a>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div id="criancas-section" class="profile-section active">
+                    <div class="card mb-4">
+                        <div class="card-header"><h4 class="mb-0">Adicionar Nova Criança</h4></div>
+                        <div class="card-body">
+                             <form id="criancaForm">
+                                <div class="mb-3">
+                                    <label for="nome-crianca" class="form-label">Nome da Criança</label>
+                                    <input type="text" class="form-control" id="nome-crianca" required>
+                                </div>
+                                <div class="date-selects mb-3">
+                                    <select id="dia-crianca" class="form-select" required>
+                                        <option value="">Dia</option>
+                                    </select>
+                                    <select id="mes-crianca" class="form-select" required>
+                                        <option value="">Mês</option>
+                                    </select>
+                                    <select id="ano-crianca" class="form-select" required>
+                                        <option value="">Ano</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="escola-crianca" class="form-label">Escola</label>
+                                    <input type="text" class="form-control" id="escola-crianca">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="obs-crianca" class="form-label">Observações</label>
+                                    <textarea class="form-control" id="obs-crianca"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Adicionar Criança</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h4 class="mb-0">Crianças Registadas</h4></div>
+                        <div id="lista-criancas" class="list-group list-group-flush"></div>
+                    </div>
+                </div>
+
+                <div id="seguranca-section" class="profile-section">
+                     <div class="card">
+                        <div class="card-header"><h4 class="mb-0">Segurança da Conta</h4></div>
+                        <div class="card-body">
+                            <form id="updateInfoForm" class="mb-5">
+                                <h5>Alterar Informações</h5>
+                                <div class="mb-3">
+                                    <label for="new-name" class="form-label">Nome</label>
+                                    <input type="text" class="form-control" id="new-name" placeholder="O seu nome completo">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-email" class="form-label">E-mail</label>
+                                    <input type="email" class="form-control" id="new-email" placeholder="O seu novo e-mail">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="info-current-password" class="form-label">Senha Atual (para confirmar)</label>
+                                    <input type="password" class="form-control" id="info-current-password" required placeholder="Digite a sua senha atual">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Guardar Informações</button>
+                            </form>
+                            <hr>
+                             <form id="updatePasswordForm" class="mb-5">
+                                <h5>Alterar Senha</h5>
+                                <div class="mb-3">
+                                    <label for="pass-current-password" class="form-label">Senha Atual</label>
+                                    <input type="password" class="form-control" id="pass-current-password" required placeholder="Digite a sua senha atual">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new-password" class="form-label">Nova Senha</label>
+                                    <input type="password" class="form-control" id="new-password" required placeholder="Mínimo 8 caracteres">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirm-new-password" class="form-label">Confirmar Nova Senha</label>
+                                    <input type="password" class="form-control" id="confirm-new-password" required placeholder="Repita a nova senha">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                            </form>
+                            <hr>
+                            <div class="p-3 border border-danger rounded">
+                                <p>A exclusão da sua conta é uma ação irreversível.</p>
+                                <button id="delete-account-btn" class="btn btn-danger">Excluir a Minha Conta</button>
+                            </div>
+                        </div>**
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="js/i18n.js"></script>
+    <script src="js/geral.js"></script>
+    <script src="js/perfil-responsavel.js"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecionando...</title>
+    <script>
+        // Este arquivo irá redirecionar o usuário para a página de perfil correta.
+        document.addEventListener('DOMContentLoaded', function() {
+            const usuario = JSON.parse(sessionStorage.getItem('usuarioLogado'));
+
+            if (!usuario) {
+                window.location.href = 'index.html'; // Se não estiver logado, vai para o login
+                return;
+            }
+
+            if (usuario.role === 'responsavel') {
+                window.location.href = 'perfil-responsavel.html';
+            } else if (usuario.role === 'motorista') {
+                window.location.href = 'perfil-motorista.html';
+            } else {
+                // Fallback ou página de erro
+                alert('Tipo de usuário desconhecido!');
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</head>
+<body>
+    <p>Aguarde, estamos preparando seu perfil...</p>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing - Resetar Senha</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+    <div class="container mt-5 pt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body text-center p-5">
+                        <img src="img/perfil.png" class="rounded-circle mb-3" width="100" alt="Avatar">
+                        <h2 class="mb-4" data-i18n="resetPassword">Resetar Senha</h2>
+                        <form id="resetSenhaForm">
+                            <div class="mb-3">
+                                <label for="reset-email" class="form-label" data-i18n="email">E-mail</label>
+                                <input type="email" class="form-control" id="reset-email" data-i18n-placeholder="enterEmail" placeholder="Digite seu e-mail cadastrado" required>
+                            </div>
+                            <div id="feedback" class="mb-3"></div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" data-i18n="sendResetLink">Enviar Código de Recuperação</button>
+                            <p>Lembrou a senha? <a href="index.html" data-i18n="loginLink">Fazer Login</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="js/i18n.js"></script>
+    <script src="js/geral.js"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main stylesheet / Estilo principal -->
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <!-- Favicon & theme color -->
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+</head>
+<body>
+    <div class="container mt-5 pt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body text-center p-5">
+                        <img src="img/perfil.png" class="rounded-circle mb-3" width="100" alt="Avatar">
+                        <h2 class="mb-4" data-i18n="guardian">Responsável</h2>
+                        <form id="cadastroForm" novalidate>
+                            <div class="mb-3">
+                                <label for="cadastro-nome" class="form-label" data-i18n="name">Nome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-nome" data-i18n-placeholder="namePlaceholder" placeholder="Digite seu nome" required>
+                                <div class="invalid-feedback">
+                                </div>
+                            <div class="mb-3">
+                                <label for="cadastro-email" class="form-label">E-mail <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="cadastro-email" placeholder="Digite seu e-mail" required>
+                                <div class="invalid-feedback">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-cpf" class="form-label">CPF <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cadastro-cpf" placeholder="Digite seu CPF (apenas números)" maxlength="14" required>
+                                <div class="invalid-feedback">
+                                </div>
+                                <!-- Div para feedback de validação do CPF -->
+                                <div id="cpf-feedback" class="cpf-feedback"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-nascimento" class="form-label">Data de Nascimento <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="cadastro-nascimento" required>
+                                <div class="invalid-feedback">
+                                </div>
+                                <!-- Div para feedback de validação da data de nascimento -->
+                                <div id="nascimento-feedback" class="nascimento-feedback"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-senha" class="form-label">Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="cadastro-senha" placeholder="Digite sua senha" required>
+                                <!-- Div para feedback de força da senha -->
+                                <div id="senha-feedback" class="senha-feedback"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cadastro-confirma-senha" class="form-label">Confirmar Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="cadastro-confirma-senha" placeholder="Confirme sua senha" required>
+                                <!-- Div para feedback de coincidência de senhas -->
+                                <div id="confirma-senha-feedback" class="confirma-senha-feedback"></div>
+                            </div>
+                            <div class="mb-3 d-none">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="role" id="role-responsavel" value="responsavel" checked>
+                                    <label class="form-check-label" for="role-responsavel">
+                                        Responsável
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" data-i18n="registerButton">CADASTRAR</button>
+                            <p data-i18n="alreadyHaveAccount">Já tem uma conta? <a href="index.html" data-i18n="loginLink">Logar</a></p>
+                            <p data-i18n="isDriver">É motorista ? <a href="motorista.html" data-i18n="driverRegister">Cadastro Motorista</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle com Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="js/i18n.js"></script>
+    <!-- JavaScript geral -->
+    <script src="js/geral.js"></script>
+    <!-- Ícones do Material Design (necessários para o botão de troca de tema) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Script do tema já incluso acima / Theme script already included above -->
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main stylesheet / Estilo principal -->
+    <link rel="stylesheet" href="estilo.css">
+    <!-- i18n CSS -->
+    <link rel="stylesheet" href="css/i18n.css">
+    <!-- Favicon & theme color -->
+    <link rel="icon" href="img/perfil.png">
+    <meta name="theme-color" content="#0d6efd">
+    <!-- Leaflet CSS for map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+</head>
+<body>
+    <!-- Barra de Navegação Principal -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard.html">VanTracing</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html" data-i18n="dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="perfil.html" data-i18n="profile">Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="rota-tempo-real.html" data-i18n="realTimeTracking">Rota em Tempo Real</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="historico-rotas.html" data-i18n="routeHistory">Histórico de Rotas</a>
+                    </li>
+                </ul>
+                <button id="logout-btn" class="btn btn-outline-light" data-i18n="logout">Sair</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-5">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-1" data-i18n="realTimeTracking">Rota em Tempo Real</h2>
+                <div class="d-flex align-items-center mb-3">
+                  <p class="mb-0 me-3">Acompanhe a localização do motorista em tempo real.</p>
+                  <span class="badge bg-secondary" id="share-status-map">Compartilhamento: desconhecido</span>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-body p-0">
+                        <div id="map" style="height: 420px; width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card text-center mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-car-side text-primary me-2"></i>Status</h5>
+                        <p class="card-text lead">Em andamento</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-clock text-warning me-2"></i>Tempo estimado</h5>
+                        <p class="card-text lead">15 minutos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-route text-success me-2"></i>Distância</h5>
+                        <p class="card-text lead">5 km</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle com Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- i18n System (load before other scripts) / Sistema i18n (carregar antes) -->
+    <script src="js/i18n.js"></script>
+    <!-- Leaflet JS for map -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Tracking logic -->
+    <script src="js/tracking.js"></script>
+    <!-- Ícones do Material Design (necessários para o botão de troca de tema) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <!-- JavaScript geral -->
+        <script src="js/geral.js"></script>
+        <script>
+            // Initialize map tracking on this page
+            document.addEventListener('DOMContentLoaded', () => {
+                if (typeof initMapTracking === 'function') {
+                    initMapTracking();
+                }
+                const statusEl = document.getElementById('share-status-map');
+                function refresh(){
+                  const on = typeof getSharingStatus==='function' ? getSharingStatus() : false;
+                  statusEl.textContent = on ? 'Compartilhamento: ligado' : 'Compartilhamento: desligado';
+                  statusEl.classList.toggle('bg-success', on);
+                  statusEl.classList.toggle('bg-secondary', !on);
+                }
+                refresh();
+                window.addEventListener('storage', refresh);
+            });
+        </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing - Test i18n</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="estilo.css">
+    <link rel="stylesheet" href="css/i18n.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.ok {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 VanTracing - Test Page / Página de Teste</h1>
+        <p>This page tests the internationalization system / Esta página testa o sistema de internacionalização</p>
+        
+        <hr>
+        
+        <div class="test-section">
+            <h3>✅ Test 1: Files Loaded / Arquivos Carregados</h3>
+            <p>JavaScript i18n.js: <span id="i18n-loaded" class="status error">Not Loaded</span></p>
+            <p>CSS i18n.css: <span id="css-loaded" class="status error">Not Loaded</span></p>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Test 2: Language Detection / Detecção de Idioma</h3>
+            <p>Current Language / Idioma Atual: <strong id="current-lang">Loading...</strong></p>
+            <p>Browser Language / Idioma do Navegador: <strong id="browser-lang">Loading...</strong></p>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Test 3: Translation System / Sistema de Tradução</h3>
+            <p data-i18n="login">Login</p>
+            <p data-i18n="email">E-mail</p>
+            <p data-i18n="password">Senha</p>
+            <p data-i18n="dashboard">Painel de Controle</p>
+            <p data-i18n="logout">Sair</p>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Test 4: Language Switcher / Botão de Troca de Idioma</h3>
+            <p>Check if the language switcher button appears in the top right corner.</p>
+            <p>Verifique se o botão de troca de idioma aparece no canto superior direito.</p>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Test 5: Manual Translation / Tradução Manual</h3>
+            <p>Test t() function / Teste função t():</p>
+            <ul id="manual-tests">
+                <li>Loading...</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Test 6: Database Connection / Conexão com Banco de Dados</h3>
+            <p>Environment variables support: <span id="env-support" class="status ok">Implemented</span></p>
+            <p>See .env.example file for configuration / Veja arquivo .env.example para configuração</p>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Test Results / Resultados dos Testes</h3>
+            <div id="test-results">
+                <p>Running tests... / Executando testes...</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="index.html" class="btn btn-primary">Go to Login / Ir para Login</a>
+            <a href="README.md" class="btn btn-secondary">View Documentation / Ver Documentação</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/geral.js"></script>
+    
+    <script>
+        // Test script / Script de teste
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for i18n to load / Aguarda carregamento do i18n
+            setTimeout(runTests, 500);
+        });
+
+        function runTests() {
+            const results = [];
+            
+            // Test 1: Check if i18n is loaded
+            if (typeof currentLanguage !== 'undefined' && typeof t === 'function') {
+                document.getElementById('i18n-loaded').textContent = 'Loaded ✓';
+                document.getElementById('i18n-loaded').className = 'status ok';
+                results.push('✅ i18n.js loaded successfully');
+            } else {
+                results.push('❌ i18n.js failed to load');
+            }
+
+            // Check CSS
+            const languageSwitcher = document.querySelector('.language-switcher');
+            if (languageSwitcher) {
+                document.getElementById('css-loaded').textContent = 'Loaded ✓';
+                document.getElementById('css-loaded').className = 'status ok';
+                results.push('✅ i18n.css loaded and language switcher created');
+            } else {
+                results.push('⚠️ Language switcher not found (may take a moment)');
+            }
+
+            // Test 2: Language detection
+            if (typeof currentLanguage !== 'undefined') {
+                document.getElementById('current-lang').textContent = currentLanguage.toUpperCase();
+                results.push(`✅ Current language detected: ${currentLanguage}`);
+            }
+            
+            const browserLang = navigator.language || navigator.userLanguage;
+            document.getElementById('browser-lang').textContent = browserLang;
+            results.push(`ℹ️ Browser language: ${browserLang}`);
+
+            // Test 5: Manual translation
+            if (typeof t === 'function') {
+                const manualTestsList = document.getElementById('manual-tests');
+                manualTestsList.innerHTML = `
+                    <li>t('login') = "${t('login')}"</li>
+                    <li>t('email') = "${t('email')}"</li>
+                    <li>t('success') = "${t('success')}"</li>
+                    <li>t('dashboard') = "${t('dashboard')}"</li>
+                `;
+                results.push('✅ t() function working correctly');
+            }
+
+            // Display results
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<ul>' + results.map(r => `<li>${r}</li>`).join('') + '</ul>';
+
+            // Count successes
+            const successCount = results.filter(r => r.startsWith('✅')).length;
+            const totalTests = results.filter(r => r.startsWith('✅') || r.startsWith('❌')).length;
+            
+            resultsDiv.innerHTML += `
+                <div class="alert alert-${successCount === totalTests ? 'success' : 'warning'} mt-3">
+                    <strong>Tests Passed / Testes Aprovados: ${successCount}/${totalTests}</strong><br>
+                    ${successCount === totalTests ? 
+                        '🎉 All systems operational! / Todos os sistemas operacionais!' : 
+                        '⚠️ Some issues detected. Check console for details. / Alguns problemas detectados. Verifique o console.'}
+                </div>
+            `;
+        }
+
+        // Log for debugging
+        console.log('🧪 VanTracing Test Page Loaded');
+        console.log('Current Language:', typeof currentLanguage !== 'undefined' ? currentLanguage : 'Not loaded');
+        console.log('Translation function available:', typeof t === 'function');
+    </script>
 </body>
 </html>

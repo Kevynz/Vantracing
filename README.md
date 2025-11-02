@@ -203,16 +203,22 @@ Vantracing/
 │   └── get_location.php      # Get driver location (session) / Obter localização (sessão)
 ├── css/                       # Stylesheets
 │   └── i18n.css              # Internationalization styles / Estilos de internacionalização
-├── JavaScript/                # Frontend scripts
+├── js/                        # Frontend scripts
 │   ├── geral.js              # General utilities / Utilitários gerais
 │   ├── i18n.js               # Internationalization / Internacionalização
 │   ├── perfil-motorista.js   # Driver profile logic / Lógica do perfil do motorista
 │   ├── perfil-responsavel.js # Guardian profile logic / Lógica do responsável
+│   └── tracking.js           # Real-time tracking / Rastreamento em tempo real
 │   └── tracking.js           # Real-time tracking logic / Lógica de rastreamento
 ├── database/
 │   └── migrations/           # SQL migrations (idempotent) / Migrações SQL (idempotentes)
 ├── img/                       # Images and assets / Imagens e recursos
 ├── logs/                      # API/application logs / Logs da aplicação
+├── pages/                     # PHP page files / Arquivos PHP de páginas
+│   ├── dashboard_motorista.php    # Driver dashboard / Dashboard do motorista
+│   ├── dashboard_responsavel.php  # Guardian dashboard / Dashboard do responsável
+│   ├── gerenciar_criancas.php     # Child management / Gerenciar crianças
+│   └── perfil.php                 # Profile redirect / Redirecionamento de perfil
 ├── cadastro.html             # Registration page / Página de cadastro
 ├── dashboard.html            # Main dashboard / Painel principal
 ├── historico-rotas.html      # Route history / Histórico de rotas
@@ -220,8 +226,8 @@ Vantracing/
 ├── motorista.html            # Driver registration / Cadastro de motorista
 ├── nova-senha.html           # New password page / Página de nova senha
 ├── perfil.html               # Profile page / Página de perfil
-├── perfilmotorista.html      # Driver profile / Perfil do motorista
-├── perfilreponsável.html     # Guardian profile / Perfil do responsável
+├── perfil-motorista.html     # Driver profile / Perfil do motorista
+├── perfil-responsavel.html   # Guardian profile / Perfil do responsável
 ├── reset-senha.html          # Password reset / Redefinição de senha
 ├── responsavel.html          # Guardian registration / Cadastro de responsável
 ├── rota-tempo-real.html      # Real-time tracking / Rastreamento em tempo real
