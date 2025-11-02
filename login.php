@@ -8,7 +8,7 @@ require_once 'config.php';
 if ($usuario['role'] === 'motorista') {
     header("Location: dashboard_motorista.php");
 } else {
-    header("Location: dashboard_responsavel.php");
+    header("Location: pages/dashboard_responsavel.php");
 }
 exit();
 ?>
