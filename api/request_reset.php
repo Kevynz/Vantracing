@@ -1,45 +1,63 @@
 <?php
+/**
+ * Password Reset Request Handler / Manipulador de Solicitação de Redefinição de Senha
+ * 
+ * Secure endpoint for requesting password reset tokens
+ * Endpoint seguro para solicitar tokens de redefinição de senha
+ * 
+ * @package VanTracing
+ * @author Kevyn
+ * @version 2.0
+ */
+
+// Initialize security middleware / Inicializar middleware de segurança
+require_once 'security_helper.php';
+
+// Apply security with stricter rate limiting for password resets
+// Aplicar segurança com limitação de taxa mais rigorosa para redefinições de senha
+secure_api([
+    'rate_limit' => 3,    // Only 3 password reset attempts per minute
+    'window' => 60,       // 60 minute window for rate limiting
+    'session' => false    // No session needed for password reset
+]);
 
 // Inclui o arquivo que faz a conexão com o banco de dados.
 require 'db_connect.php';
-// Define o cabeçalho da resposta como JSON, para que o JavaScript entenda o que está recebendo.
-header('Content-Type: application/json');
 
-/**
- * Função auxiliar para enviar uma resposta JSON padronizada e encerrar o script.
- * @param bool $success - Se a operação teve sucesso.
- * @param string $msg - A mensagem a ser enviada.
- * @param array $data - Dados extras para incluir na resposta (como o token para teste).
- */
-function send_json_response($success, $msg, $data = []) {
-    // Monta o array de resposta e o converte para o formato JSON.
-    echo json_encode(['success' => $success, 'msg' => $msg] + $data);
-    // Encerra a execução do script para não enviar mais nada.
-    exit();
+// Validate request method / Validar método da requisição
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    send_error('Method not allowed', 'Método não permitido', 405);
 }
 
-// Pega o e-mail enviado pelo formulário via método POST. O '??' '' evita erros se o campo não existir.
-$email = $_POST['email'] ?? '';
+// Rate limit password reset attempts / Limitar tentativas de redefinição de senha
+SecurityHelper::rateLimitAction('password_reset', 3, 3600); // 3 attempts per hour
+
+// Sanitize and validate input / Sanitizar e validar entrada
+$email = clean_input($_POST['email'] ?? '', 'email');
 
 // Validação inicial: verifica se o e-mail não está vazio e se tem um formato válido.
-if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    send_json_response(false, 'Por favor, insira um e-mail válido.');
+if (empty($email) || !SecurityHelper::validateEmail($email)) {
+    send_error('Invalid email format', 'Por favor, insira um e-mail válido.', 400);
 }
 
 // 1. Prepara uma consulta SQL segura (usando prepared statements) para verificar se o e-mail existe na tabela de usuários.
-$stmt = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
-// Associa o valor da variável $email ao '?' na consulta, definindo o tipo como string ('s').
-$stmt->bind_param("s", $email);
-// Executa a consulta.
-$stmt->execute();
+$stmt = $conn->prepare("SELECT id, nome FROM usuarios WHERE email = ?");
+// Executa a consulta com o parâmetro.
+$stmt->execute([$email]);
 // Pega o resultado da consulta.
-$result = $stmt->get_result();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Se a consulta não retornar nenhuma linha, o e-mail não está cadastrado.
-if ($result->num_rows === 0) {
+if (!$user) {
     // Por segurança, não informamos ao usuário que o e-mail não foi encontrado.
     // Isso evita que pessoas mal-intencionadas descubram quais e-mails estão cadastrados no sistema.
-    send_json_response(true, 'Se o e-mail estiver cadastrado, um código de recuperação foi enviado.');
+    // Log the attempt / Registrar a tentativa
+    SecurityHelper::logEvent('password_reset_invalid_email', [
+        'email' => $email,
+        'ip' => SecurityHelper::getClientIP()
+    ]);
+    
+    send_success(['message' => 'Se o e-mail estiver cadastrado, um código de recuperação foi enviado.']);
 }
 
 // 2. Se o e-mail existe, gera um token (código) numérico aleatório de 6 dígitos.
@@ -54,17 +72,11 @@ $expires_at = $expires->format('Y-m-d H:i:s');
 // 3. Prepara uma consulta para inserir o novo token ou atualizar um existente para o mesmo e-mail.
 // A cláusula 'ON DUPLICATE KEY UPDATE' é útil para que o usuário possa solicitar um novo código sem gerar um erro.
 $stmt_update = $conn->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE token = ?, expires_at = ?");
-// Associa os valores às 5 posições '?' da consulta.
-$stmt_update->bind_param("sssss", $email, $token, $expires_at, $token, $expires_at);
-$stmt_update->execute();
+// Executa com todos os parâmetros.
+$stmt_update->execute([$email, $token, $expires_at, $token, $expires_at]);
 
-// 4. Get user name and send password reset email / Obter nome do usuário e enviar email de redefinição
-$user = $result->fetch_assoc();
-$stmt_name = $conn->prepare("SELECT nome FROM usuarios WHERE email = ?");
-$stmt_name->bind_param("s", $email);
-$stmt_name->execute();
-$user_result = $stmt_name->get_result();
-$user_name = $user_result->fetch_assoc()['nome'] ?? 'Usuário';
+// 4. Get user name from the already fetched user data / Obter nome do usuário dos dados já obtidos
+$user_name = $user['nome'] ?? 'Usuário';
 
 // Send password reset email / Enviar email de redefinição de senha
 $is_email_sent = true;
@@ -80,19 +92,27 @@ try {
     $is_email_sent = false;
 }
 
+// Log successful password reset request / Registrar solicitação de redefinição bem-sucedida
+SecurityHelper::logEvent('password_reset_requested', [
+    'email' => $email,
+    'user_id' => $user['id'],
+    'token_generated' => true,
+    'email_sent' => $is_email_sent,
+    'ip' => SecurityHelper::getClientIP()
+]);
+
 if ($is_email_sent) {
     // Return success response with test token for development / Retorna resposta de sucesso com token de teste para desenvolvimento
-    $response_data = ['token_para_teste' => $token];
+    $response_data = [];
     if (getenv('APP_DEBUG') === 'true') {
         $response_data['debug_token'] = $token;
+        $response_data['debug_expires'] = $expires_at;
     }
-    send_json_response(true, 'Um código de recuperação foi enviado para seu e-mail.', $response_data);
+    send_success($response_data, 'Password reset code sent', 'Um código de recuperação foi enviado para seu e-mail.');
 } else {
-    send_json_response(false, 'Não foi possível enviar o e-mail de recuperação.');
+    send_error('Email delivery failed', 'Não foi possível enviar o e-mail de recuperação. Tente novamente mais tarde.', 500);
 }
 
-// Fecha as conexões para liberar recursos.
-$stmt->close();
-$conn->close();
+// PDO connections are closed automatically / Conexões PDO são fechadas automaticamente
 
 ?>

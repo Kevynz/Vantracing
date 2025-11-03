@@ -1,17 +1,27 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+/**
+ * Profile Update Handler / Manipulador de Atualização de Perfil
+ * 
+ * Secure endpoint for updating user profile information
+ * Endpoint seguro para atualizar informações do perfil do usuário
+ * 
+ * @package VanTracing
+ * @author Kevyn
+ * @version 2.0
+ */
+
+// Initialize security middleware / Inicializar middleware de segurança
+require_once 'security_helper.php';
+
+// Apply security with authentication required
+// Aplicar segurança com autenticação obrigatória
+secure_api([
+    'rate_limit' => 10,   // 10 profile updates per hour
+    'window' => 60,       // 60 minute window
+    'session' => true     // Require active session
+]);
 
 require 'db_connect.php';
-
-header('Content-Type: application/json');
-
-// Função para enviar respostas JSON
-function send_json_response($success, $msg, $data = []) {
-    $response = ['success' => $success, 'msg' => $msg];
-    echo json_encode(array_merge($response, $data));
-    exit();
-}
 
 $userId = $_POST['id'] ?? 0;
 $currentPassword = $_POST['current_password'] ?? '';

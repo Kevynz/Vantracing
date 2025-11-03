@@ -181,11 +181,17 @@ class SecurityHelper {
      * Log security event / Registrar evento de segurança
      */
     public static function logEvent($type, $data = []) {
-        if (!self::$middleware) {
-            self::$middleware = new SecurityMiddleware();
+        // Use advanced logger if available / Usar logger avançado se disponível
+        if (class_exists('VanTracingLogger')) {
+            require_once 'logger.php';
+            VanTracingLogger::security(VanTracingLogger::LEVEL_WARNING, $type, $data);
+        } else {
+            // Fallback to middleware logging / Fallback para logging do middleware
+            if (!self::$middleware) {
+                self::$middleware = new SecurityMiddleware();
+            }
+            self::$middleware->logSecurityIncident($type, $data);
         }
-        
-        self::$middleware->logSecurityIncident($type, $data);
     }
     
     /**
