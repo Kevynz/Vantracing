@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Backup - VanTracing</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="estilo.css">
+    
+    <style>
+        .backup-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #007bff;
+        }
+        .backup-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 123, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        .backup-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-passed { background-color: #28a745; }
+        .status-failed { background-color: #dc3545; }
+        .status-pending { background-color: #ffc107; }
+        .status-skipped { background-color: #6c757d; }
+        .backup-type-badge {
+            font-size: 0.75em;
+            padding: 0.25em 0.6em;
+        }
+        .progress-animated {
+            background-image: linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+            animation: progress-bar-stripes 1s linear infinite;
+        }
+        @keyframes progress-bar-stripes {
+            0% { background-position: 1rem 0; }
+            100% { background-position: 0 0; }
+        }
+        .file-size {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .backup-stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .config-panel {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .backup-action-btn {
+            margin: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="dashboard.html">
+                <i class="bi bi-shield-check me-2"></i>VanTracing - Sistema de Backup
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="bi bi-house"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_panel.html">
+                            <i class="bi bi-gear"></i> Admin
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="backup_center.html">
+                            <i class="bi bi-database-check"></i> Backup
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="h2 mb-3">
+                    <i class="bi bi-database-check text-primary me-3"></i>
+                    Sistema de Backup Automatizado
+                </h1>
+                <p class="text-muted">Gerenciamento completo de backups do banco de dados com verificação de integridade e restauração.</p>
+            </div>
+        </div>
+
+        <!-- Backup Statistics Row -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card backup-stats-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="card-title text-light mb-1">Total de Backups</h6>
+                                <h3 class="mb-0" id="totalBackups">-</h3>
+                            </div>
+                            <i class="bi bi-archive fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="card-title text-light mb-1">Últimos 7 Dias</h6>
+                                <h3 class="mb-0" id="recentBackups">-</h3>
+                            </div>
+                            <i class="bi bi-clock-history fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="card-title text-light mb-1">Tamanho Total</h6>
+                                <h3 class="mb-0" id="totalSize">-</h3>
+                            </div>
+                            <i class="bi bi-hdd fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card bg-warning text-dark h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="card-title mb-1">Próximo Automático</h6>
+                                <h5 class="mb-0" id="nextBackup">-</h5>
+                            </div>
+                            <i class="bi bi-calendar-event fs-1 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Panel -->
+        <div class="config-panel">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h5><i class="bi bi-gear me-2"></i>Configurações do Sistema</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <span class="badge bg-secondary me-2">Backup Automático:</span>
+                                <span id="autoBackupStatus" class="fw-bold">-</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary me-2">Intervalo:</span>
+                                <span id="backupInterval" class="fw-bold">-</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary me-2">Máximo de Backups:</span>
+                                <span id="maxBackups" class="fw-bold">-</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-2">
+                                <span class="badge bg-secondary me-2">Compressão:</span>
+                                <span id="compressionStatus" class="fw-bold">-</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary me-2">Verificação:</span>
+                                <span id="verificationStatus" class="fw-bold">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <button type="button" class="btn btn-primary backup-action-btn" onclick="createManualBackup()">
+                        <i class="bi bi-plus-circle me-2"></i>Criar Backup Manual
+                    </button>
+                    <button type="button" class="btn btn-success backup-action-btn" onclick="runAutomaticBackup()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Executar Automático
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary backup-action-btn" onclick="refreshBackupList()">
+                        <i class="bi bi-arrow-repeat me-2"></i>Atualizar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backup List -->
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ul me-2"></i>Histórico de Backups
+                        </h5>
+                        <div class="d-flex align-items-center">
+                            <input type="text" class="form-control form-control-sm me-2" 
+                                   placeholder="Buscar backups..." id="searchInput" style="width: 200px;">
+                            <select class="form-select form-select-sm" id="filterType" style="width: auto;">
+                                <option value="">Todos os tipos</option>
+                                <option value="manual">Manual</option>
+                                <option value="automatic">Automático</option>
+                                <option value="scheduled">Agendado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Arquivo</th>
+                                        <th>Tipo</th>
+                                        <th>Tamanho</th>
+                                        <th>Duração</th>
+                                        <th>Data/Hora</th>
+                                        <th>Criado por</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="backupTableBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Carregando...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="text-muted">
+                        <span id="paginationInfo">Carregando...</span>
+                    </div>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0" id="paginationNav">
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Backup Modal -->
+    <div class="modal fade" id="createBackupModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>Criar Novo Backup
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="createBackupForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="backupType" class="form-label">Tipo de Backup</label>
+                            <select class="form-select" id="backupType" required>
+                                <option value="manual">Manual</option>
+                                <option value="scheduled">Agendado</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="backupNotes" class="form-label">Observações (Opcional)</label>
+                            <textarea class="form-control" id="backupNotes" rows="3" 
+                                      placeholder="Descreva o motivo ou contexto deste backup..."></textarea>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            O backup incluirá todas as tabelas do banco de dados VanTracing. 
+                            O processo pode levar alguns minutos dependendo do tamanho dos dados.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-download me-2"></i>Criar Backup
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restore Backup Modal -->
+    <div class="modal fade" id="restoreBackupModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-arrow-up-circle me-2"></i>Restaurar Banco de Dados
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="restoreBackupForm">
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <h6><i class="bi bi-exclamation-triangle me-2"></i>ATENÇÃO - OPERAÇÃO CRÍTICA</h6>
+                            <p class="mb-2">Esta operação irá:</p>
+                            <ul class="mb-2">
+                                <li>Substituir TODOS os dados atuais do banco</li>
+                                <li>Remover dados criados após este backup</li>
+                                <li>Interromper temporariamente o sistema</li>
+                            </ul>
+                            <p class="mb-0"><strong>Esta ação NÃO PODE ser desfeita!</strong></p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Backup Selecionado:</label>
+                            <div class="card">
+                                <div class="card-body py-2">
+                                    <span id="selectedBackupInfo">Nenhum backup selecionado</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="confirmRestore" required>
+                                <label class="form-check-label" for="confirmRestore">
+                                    <strong>Confirmo que entendo os riscos e desejo continuar com a restauração</strong>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirmationText" class="form-label">
+                                Digite "CONFIRMAR RESTAURAÇÃO" para prosseguir:
+                            </label>
+                            <input type="text" class="form-control" id="confirmationText" 
+                                   placeholder="Digite exatamente: CONFIRMAR RESTAURAÇÃO" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger" id="confirmRestoreBtn" disabled>
+                            <i class="bi bi-arrow-up-circle me-2"></i>Restaurar Banco
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Modal -->
+    <div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Processando...</span>
+                        </div>
+                    </div>
+                    <h5 id="progressTitle">Processando...</h5>
+                    <p class="text-muted mb-3" id="progressMessage">Aguarde enquanto a operação é executada.</p>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-animated" 
+                             style="width: 100%" id="progressBar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Backup Management Script -->
+    <script>
+        // Global variables
+        let backupList = [];
+        let backupStats = {};
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let selectedBackupId = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBackupData();
+            setupEventListeners();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(loadBackupData, 30000);
+        });
+
+        function setupEventListeners() {
+            // Search and filter
+            document.getElementById('searchInput').addEventListener('input', filterBackups);
+            document.getElementById('filterType').addEventListener('change', filterBackups);
+            
+            // Restore confirmation
+            document.getElementById('confirmationText').addEventListener('input', validateRestoreForm);
+            document.getElementById('confirmRestore').addEventListener('change', validateRestoreForm);
+            
+            // Form submissions
+            document.getElementById('createBackupForm').addEventListener('submit', handleCreateBackup);
+            document.getElementById('restoreBackupForm').addEventListener('submit', handleRestoreBackup);
+        }
+
+        async function loadBackupData() {
+            try {
+                const response = await fetch('api/backup_api.php?action=stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatistics(data.stats);
+                    updateConfiguration(data.config);
+                    
+                    // Load backup list
+                    await loadBackupList();
+                } else {
+                    showAlert('Erro ao carregar dados: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                showAlert('Erro de conexão ao carregar dados do backup', 'danger');
+            }
+        }
+
+        async function loadBackupList(page = 1) {
+            try {
+                const offset = (page - 1) * itemsPerPage;
+                const response = await fetch(`api/backup_api.php?action=list&limit=${itemsPerPage}&offset=${offset}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    backupList = data.backups;
+                    updateBackupTable(data.backups);
+                    updatePagination(data.pagination);
+                } else {
+                    showAlert('Erro ao carregar lista: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar lista:', error);
+                showAlert('Erro ao carregar lista de backups', 'danger');
+            }
+        }
+
+        function updateStatistics(stats) {
+            document.getElementById('totalBackups').textContent = stats.total_backups;
+            document.getElementById('recentBackups').textContent = stats.recent_backups;
+            document.getElementById('totalSize').textContent = formatFileSize(stats.total_size_bytes);
+            
+            // Calculate next backup time (simplified)
+            const lastBackup = stats.last_backup;
+            if (lastBackup && lastBackup.backup_type === 'automatic') {
+                const lastTime = new Date(lastBackup.created_at);
+                const nextTime = new Date(lastTime.getTime() + (6 * 60 * 60 * 1000)); // +6 hours
+                document.getElementById('nextBackup').textContent = formatDateTime(nextTime);
+            } else {
+                document.getElementById('nextBackup').textContent = 'Pendente';
+            }
+        }
+
+        function updateConfiguration(config) {
+            document.getElementById('autoBackupStatus').textContent = config.automatic_backup_enabled ? 'Ativo' : 'Inativo';
+            document.getElementById('autoBackupStatus').className = config.automatic_backup_enabled ? 'fw-bold text-success' : 'fw-bold text-warning';
+            
+            document.getElementById('backupInterval').textContent = config.backup_interval_hours + ' horas';
+            document.getElementById('maxBackups').textContent = config.max_backups;
+            document.getElementById('compressionStatus').textContent = config.compression_enabled ? 'Ativa' : 'Inativa';
+            document.getElementById('verificationStatus').textContent = config.verification_enabled ? 'Ativa' : 'Inativa';
+        }
+
+        function updateBackupTable(backups) {
+            const tbody = document.getElementById('backupTableBody');
+            
+            if (backups.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="bi bi-archive fs-1 d-block mb-2 opacity-50"></i>
+                            Nenhum backup encontrado
+                        </td>
+                    </tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = backups.map(backup => `
+                <tr>
+                    <td>
+                        <span class="backup-status status-${backup.verification_status}"></span>
+                        ${getStatusText(backup.verification_status)}
+                    </td>
+                    <td>
+                        <div class="d-flex flex-column">
+                            <span class="fw-bold">${backup.filename}</span>
+                            <small class="text-muted">${backup.notes || 'Sem observações'}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge backup-type-badge ${getTypeBadgeClass(backup.backup_type)}">
+                            ${getTypeText(backup.backup_type)}
+                        </span>
+                    </td>
+                    <td class="file-size">${formatFileSize(backup.file_size)}</td>
+                    <td>${backup.backup_duration_seconds}s</td>
+                    <td>${formatDateTime(backup.created_at)}</td>
+                    <td>${backup.created_by_name || 'Sistema'}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-info" onclick="verifyBackup(${backup.id})" title="Verificar">
+                                <i class="bi bi-shield-check"></i>
+                            </button>
+                            <button class="btn btn-outline-warning" onclick="selectForRestore(${backup.id})" title="Restaurar">
+                                <i class="bi bi-arrow-up-circle"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="deleteBackup(${backup.id})" title="Excluir">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'passed': 'Verificado',
+                'failed': 'Falha',
+                'pending': 'Pendente',
+                'skipped': 'Ignorado'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getTypeText(type) {
+            const typeMap = {
+                'manual': 'Manual',
+                'automatic': 'Automático',
+                'scheduled': 'Agendado'
+            };
+            return typeMap[type] || type;
+        }
+
+        function getTypeBadgeClass(type) {
+            const classMap = {
+                'manual': 'bg-primary',
+                'automatic': 'bg-success',
+                'scheduled': 'bg-info'
+            };
+            return classMap[type] || 'bg-secondary';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatDateTime(dateString) {
+            return new Date(dateString).toLocaleString('pt-BR');
+        }
+
+        // Backup operations
+        async function createManualBackup() {
+            const modal = new bootstrap.Modal(document.getElementById('createBackupModal'));
+            modal.show();
+        }
+
+        async function runAutomaticBackup() {
+            showProgress('Executando Backup Automático', 'Verificando se backup automático é necessário...');
+            
+            try {
+                const response = await fetch('api/backup_api.php?action=run_automatic', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                
+                const data = await response.json();
+                hideProgress();
+                
+                if (data.success) {
+                    if (data.backup_created) {
+                        showAlert('Backup automático executado com sucesso!', 'success');
+                        await loadBackupData();
+                    } else {
+                        showAlert('Backup automático não é necessário no momento', 'info');
+                    }
+                } else {
+                    showAlert('Erro ao executar backup: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                hideProgress();
+                showAlert('Erro de conexão ao executar backup automático', 'danger');
+            }
+        }
+
+        async function handleCreateBackup(event) {
+            event.preventDefault();
+            
+            const type = document.getElementById('backupType').value;
+            const notes = document.getElementById('backupNotes').value;
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createBackupModal'));
+            modal.hide();
+            
+            showProgress('Criando Backup', 'Preparando backup do banco de dados...');
+            
+            try {
+                const response = await fetch('api/backup_api.php?action=create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, notes })
+                });
+                
+                const data = await response.json();
+                hideProgress();
+                
+                if (data.success) {
+                    showAlert('Backup criado com sucesso!', 'success');
+                    await loadBackupData();
+                    document.getElementById('createBackupForm').reset();
+                } else {
+                    showAlert('Erro ao criar backup: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                hideProgress();
+                showAlert('Erro de conexão ao criar backup', 'danger');
+            }
+        }
+
+        async function verifyBackup(backupId) {
+            showProgress('Verificando Backup', 'Validando integridade do arquivo de backup...');
+            
+            try {
+                const response = await fetch('api/backup_api.php?action=verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ backup_id: backupId })
+                });
+                
+                const data = await response.json();
+                hideProgress();
+                
+                if (data.success) {
+                    const message = data.verified ? 'Backup verificado com sucesso!' : 'Falha na verificação do backup';
+                    const type = data.verified ? 'success' : 'danger';
+                    showAlert(message, type);
+                    await loadBackupList(currentPage);
+                } else {
+                    showAlert('Erro ao verificar backup: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                hideProgress();
+                showAlert('Erro de conexão ao verificar backup', 'danger');
+            }
+        }
+
+        function selectForRestore(backupId) {
+            selectedBackupId = backupId;
+            const backup = backupList.find(b => b.id == backupId);
+            
+            if (backup) {
+                document.getElementById('selectedBackupInfo').innerHTML = `
+                    <strong>${backup.filename}</strong><br>
+                    <small class="text-muted">
+                        Criado em: ${formatDateTime(backup.created_at)} | 
+                        Tamanho: ${formatFileSize(backup.file_size)} |
+                        Status: ${getStatusText(backup.verification_status)}
+                    </small>
+                `;
+                
+                const modal = new bootstrap.Modal(document.getElementById('restoreBackupModal'));
+                modal.show();
+            }
+        }
+
+        function validateRestoreForm() {
+            const checkbox = document.getElementById('confirmRestore').checked;
+            const text = document.getElementById('confirmationText').value;
+            const isValid = checkbox && text === 'CONFIRMAR RESTAURAÇÃO';
+            
+            document.getElementById('confirmRestoreBtn').disabled = !isValid;
+        }
+
+        async function handleRestoreBackup(event) {
+            event.preventDefault();
+            
+            if (!selectedBackupId) {
+                showAlert('Nenhum backup selecionado', 'warning');
+                return;
+            }
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('restoreBackupModal'));
+            modal.hide();
+            
+            showProgress('Restaurando Banco de Dados', 'ATENÇÃO: Não feche esta janela durante a restauração...');
+            
+            try {
+                const response = await fetch('api/backup_api.php?action=restore', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        backup_id: selectedBackupId,
+                        confirm: true
+                    })
+                });
+                
+                const data = await response.json();
+                hideProgress();
+                
+                if (data.success) {
+                    showAlert('Banco de dados restaurado com sucesso!', 'success');
+                    // Reset form
+                    document.getElementById('restoreBackupForm').reset();
+                    selectedBackupId = null;
+                    validateRestoreForm();
+                } else {
+                    showAlert('Erro ao restaurar backup: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                hideProgress();
+                showAlert('Erro de conexão ao restaurar backup', 'danger');
+            }
+        }
+
+        async function deleteBackup(backupId) {
+            const backup = backupList.find(b => b.id == backupId);
+            
+            if (!backup || !confirm(`Confirma a exclusão do backup "${backup.filename}"?\n\nEsta ação não pode ser desfeita!`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`api/backup_api.php?action=delete&backup_id=${backupId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('Backup excluído com sucesso!', 'success');
+                    await loadBackupData();
+                } else {
+                    showAlert('Erro ao excluir backup: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão ao excluir backup', 'danger');
+            }
+        }
+
+        // Utility functions
+        function refreshBackupList() {
+            loadBackupData();
+        }
+
+        function filterBackups() {
+            // Implementation for search and filter
+            // This would filter the displayed backups based on search input and type filter
+            loadBackupList(1); // Reload first page with filters
+        }
+
+        function updatePagination(pagination) {
+            const info = document.getElementById('paginationInfo');
+            const nav = document.getElementById('paginationNav');
+            
+            const start = pagination.offset + 1;
+            const end = Math.min(pagination.offset + pagination.limit, pagination.total);
+            
+            info.textContent = `Exibindo ${start}-${end} de ${pagination.total} backups`;
+            
+            // Build pagination (simplified)
+            const totalPages = Math.ceil(pagination.total / pagination.limit);
+            currentPage = Math.floor(pagination.offset / pagination.limit) + 1;
+            
+            let paginationHTML = '';
+            
+            if (currentPage > 1) {
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadBackupList(${currentPage - 1})">Anterior</a></li>`;
+            }
+            
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                const active = i === currentPage ? 'active' : '';
+                paginationHTML += `<li class="page-item ${active}"><a class="page-link" href="#" onclick="loadBackupList(${i})">${i}</a></li>`;
+            }
+            
+            if (currentPage < totalPages) {
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadBackupList(${currentPage + 1})">Próximo</a></li>`;
+            }
+            
+            nav.innerHTML = paginationHTML;
+        }
+
+        function showProgress(title, message) {
+            document.getElementById('progressTitle').textContent = title;
+            document.getElementById('progressMessage').textContent = message;
+            const modal = new bootstrap.Modal(document.getElementById('progressModal'));
+            modal.show();
+        }
+
+        function hideProgress() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('progressModal'));
+            if (modal) modal.hide();
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert_' + Date.now();
+            
+            const alertHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert" id="${alertId}">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            alertContainer.insertAdjacentHTML('beforeend', alertHTML);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                const alertElement = document.getElementById(alertId);
+                if (alertElement) {
+                    const alert = new bootstrap.Alert(alertElement);
+                    alert.close();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
