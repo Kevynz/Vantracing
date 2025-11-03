@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Monitoramento - VanTracing</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="estilo.css">
+    
+    <style>
+        .metrics-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid;
+            min-height: 120px;
+        }
+        .metrics-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .metrics-card.cpu { border-left-color: #ff6b6b; }
+        .metrics-card.memory { border-left-color: #4ecdc4; }
+        .metrics-card.disk { border-left-color: #45b7d1; }
+        .metrics-card.database { border-left-color: #96ceb4; }
+        .metrics-card.cache { border-left-color: #feca57; }
+        .metrics-card.alerts { border-left-color: #ff9ff3; }
+
+        .health-score {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .health-score.excellent { color: #28a745; }
+        .health-score.good { color: #17a2b8; }
+        .health-score.warning { color: #ffc107; }
+        .health-score.critical { color: #dc3545; }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+
+        .alert-badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.65em;
+        }
+        .alert-critical { background-color: #dc3545; }
+        .alert-high { background-color: #fd7e14; }
+        .alert-medium { background-color: #ffc107; color: #000; }
+        .alert-low { background-color: #6c757d; }
+
+        .metric-trend {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .trend-up { color: #28a745; }
+        .trend-down { color: #dc3545; }
+        .trend-stable { color: #6c757d; }
+
+        .realtime-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #28a745;
+            animation: pulse 2s infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .performance-gauge {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+
+        .system-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-actions {
+            position: sticky;
+            top: 20px;
+        }
+
+        .tab-content {
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard.html">
+                <i class="bi bi-speedometer2 me-2"></i>VanTracing - Monitoramento
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <span class="navbar-text me-3">
+                            <span class="realtime-indicator"></span>
+                            Tempo Real Ativo
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="bi bi-house"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_panel.html">
+                            <i class="bi bi-gear"></i> Admin
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="backup_center.html">
+                            <i class="bi bi-database-check"></i> Backup
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="monitoring_dashboard.html">
+                            <i class="bi bi-graph-up"></i> Monitoramento
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <h1 class="h2 mb-3">
+                    <i class="bi bi-speedometer2 text-primary me-3"></i>
+                    Dashboard de Monitoramento Avançado
+                </h1>
+                <p class="text-muted">Monitoramento em tempo real de performance, saúde do sistema e métricas personalizadas.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="refreshAllData()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Atualizar
+                    </button>
+                    <button type="button" class="btn btn-outline-success" onclick="collectMetrics()">
+                        <i class="bi bi-collection me-2"></i>Coletar Métricas
+                    </button>
+                    <button type="button" class="btn btn-outline-info" onclick="exportData()">
+                        <i class="bi bi-download me-2"></i>Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Health Overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-lg-2 text-center">
+                                <div class="health-score" id="overallHealthScore">--</div>
+                                <small class="text-muted">Saúde Geral</small>
+                            </div>
+                            <div class="col-lg-10">
+                                <div class="system-status-grid">
+                                    <div class="metrics-card card cpu">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title mb-1">CPU</h6>
+                                                    <h4 class="mb-0" id="cpuValue">-</h4>
+                                                    <small class="text-muted">Carga do Sistema</small>
+                                                </div>
+                                                <i class="bi bi-cpu fs-2 opacity-75"></i>
+                                            </div>
+                                            <div class="mt-2">
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar" id="cpuProgress" style="width: 0%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="metrics-card card memory">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title mb-1">Memória</h6>
+                                                    <h4 class="mb-0" id="memoryValue">-</h4>
+                                                    <small class="text-muted">Uso de RAM</small>
+                                                </div>
+                                                <i class="bi bi-memory fs-2 opacity-75"></i>
+                                            </div>
+                                            <div class="mt-2">
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar" id="memoryProgress" style="width: 0%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="metrics-card card disk">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title mb-1">Disco</h6>
+                                                    <h4 class="mb-0" id="diskValue">-</h4>
+                                                    <small class="text-muted">Espaço Usado</small>
+                                                </div>
+                                                <i class="bi bi-hdd fs-2 opacity-75"></i>
+                                            </div>
+                                            <div class="mt-2">
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar" id="diskProgress" style="width: 0%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="metrics-card card database">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title mb-1">Banco</h6>
+                                                    <h4 class="mb-0" id="databaseValue">-</h4>
+                                                    <small class="text-muted">Conexões Ativas</small>
+                                                </div>
+                                                <i class="bi bi-database fs-2 opacity-75"></i>
+                                            </div>
+                                            <div class="mt-2">
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-success" id="databaseProgress" style="width: 0%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="metrics-card card cache">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title mb-1">Cache</h6>
+                                                    <h4 class="mb-0" id="cacheValue">-</h4>
+                                                    <small class="text-muted">Taxa de Acerto</small>
+                                                </div>
+                                                <i class="bi bi-lightning fs-2 opacity-75"></i>
+                                            </div>
+                                            <div class="mt-2">
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-warning" id="cacheProgress" style="width: 0%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="metrics-card card alerts">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title mb-1">Alertas</h6>
+                                                    <h4 class="mb-0" id="alertsValue">-</h4>
+                                                    <small class="text-muted">Alertas Ativos</small>
+                                                </div>
+                                                <i class="bi bi-exclamation-triangle fs-2 opacity-75"></i>
+                                            </div>
+                                            <div class="mt-2" id="alertsSeverity">
+                                                <span class="badge alert-critical me-1">0</span>
+                                                <span class="badge alert-high me-1">0</span>
+                                                <span class="badge alert-medium">0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Tabs -->
+        <ul class="nav nav-tabs" id="monitoringTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="performance-tab" data-bs-toggle="tab" data-bs-target="#performance" type="button">
+                    <i class="bi bi-speedometer2 me-2"></i>Performance
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="system-tab" data-bs-toggle="tab" data-bs-target="#system" type="button">
+                    <i class="bi bi-pc-display me-2"></i>Sistema
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="database-tab" data-bs-toggle="tab" data-bs-target="#database" type="button">
+                    <i class="bi bi-database me-2"></i>Banco de Dados
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts" type="button">
+                    <i class="bi bi-bell me-2"></i>Alertas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom" type="button">
+                    <i class="bi bi-graph-up me-2"></i>Métricas Customizadas
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="monitoringTabContent">
+            <!-- Performance Tab -->
+            <div class="tab-pane fade show active" id="performance" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Métricas de Performance em Tempo Real</h5>
+                                <select class="form-select form-select-sm" id="performanceTimeRange" style="width: auto;">
+                                    <option value="5m">Últimos 5 minutos</option>
+                                    <option value="15m">Últimos 15 minutos</option>
+                                    <option value="1h" selected>Última hora</option>
+                                    <option value="6h">Últimas 6 horas</option>
+                                    <option value="24h">Últimas 24 horas</option>
+                                </select>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="performanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card quick-actions">
+                            <div class="card-header">
+                                <h6 class="mb-0">Ações Rápidas</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary btn-sm" onclick="collectMetrics()">
+                                        <i class="bi bi-collection me-2"></i>Coletar Métricas Agora
+                                    </button>
+                                    <button class="btn btn-info btn-sm" onclick="clearCache()">
+                                        <i class="bi bi-trash me-2"></i>Limpar Cache
+                                    </button>
+                                    <button class="btn btn-warning btn-sm" onclick="optimizeDatabase()">
+                                        <i class="bi bi-gear me-2"></i>Otimizar Banco
+                                    </button>
+                                    <button class="btn btn-success btn-sm" onclick="runHealthCheck()">
+                                        <i class="bi bi-check-circle me-2"></i>Verificar Saúde
+                                    </button>
+                                </div>
+                                
+                                <hr>
+                                
+                                <h6>Configurações de Monitoramento</h6>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="realtimeEnabled" checked>
+                                    <label class="form-check-label" for="realtimeEnabled">
+                                        Tempo Real
+                                    </label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="alertsEnabled" checked>
+                                    <label class="form-check-label" for="alertsEnabled">
+                                        Alertas Ativos
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Snapshots -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Snapshots de Performance Recentes</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Data/Hora</th>
+                                                <th>CPU</th>
+                                                <th>Memória</th>
+                                                <th>Disco</th>
+                                                <th>Conexões DB</th>
+                                                <th>Cache Hit</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="snapshotsTableBody">
+                                            <tr>
+                                                <td colspan="7" class="text-center py-3">
+                                                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                    <span class="ms-2">Carregando snapshots...</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Tab -->
+            <div class="tab-pane fade" id="system" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Uso de Recursos do Sistema</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="systemResourcesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Memória e Armazenamento</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="memoryStorageChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Information -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Informações do Sistema</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row" id="systemInfo">
+                                    <div class="col-md-6">
+                                        <strong>Servidor Web:</strong> <span id="webServer">-</span><br>
+                                        <strong>Versão PHP:</strong> <span id="phpVersion">-</span><br>
+                                        <strong>Banco de Dados:</strong> <span id="databaseVersion">-</span><br>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Uptime:</strong> <span id="systemUptime">-</span><br>
+                                        <strong>Load Average:</strong> <span id="loadAverage">-</span><br>
+                                        <strong>Último Backup:</strong> <span id="lastBackup">-</span><br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Database Tab -->
+            <div class="tab-pane fade" id="database" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Performance do Banco de Dados</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="databaseChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Estatísticas do Banco</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <small class="text-muted">Conexões Ativas</small>
+                                    <div class="h4" id="dbConnections">-</div>
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted">Queries por Segundo</small>
+                                    <div class="h4" id="dbQps">-</div>
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted">Queries Lentas</small>
+                                    <div class="h4" id="dbSlowQueries">-</div>
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted">Tamanho Total</small>
+                                    <div class="h4" id="dbSize">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Database Tables -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Principais Tabelas</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Tabela</th>
+                                                <th>Linhas</th>
+                                                <th>Tamanho</th>
+                                                <th>Índices</th>
+                                                <th>Última Atualização</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="databaseTablesBody">
+                                            <tr>
+                                                <td colspan="5" class="text-center py-3">
+                                                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                    <span class="ms-2">Carregando dados das tabelas...</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts Tab -->
+            <div class="tab-pane fade" id="alerts" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Alertas do Sistema</h6>
+                                <div>
+                                    <select class="form-select form-select-sm me-2" id="alertSeverityFilter" style="width: auto; display: inline-block;">
+                                        <option value="">Todas as severidades</option>
+                                        <option value="critical">Crítico</option>
+                                        <option value="high">Alto</option>
+                                        <option value="medium">Médio</option>
+                                        <option value="low">Baixo</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-success" onclick="resolveAllAlerts()">
+                                        <i class="bi bi-check-all me-1"></i>Resolver Todos
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="alertsList">
+                                    <div class="text-center py-4">
+                                        <div class="spinner-border" role="status"></div>
+                                        <div class="mt-2">Carregando alertas...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Metrics Tab -->
+            <div class="tab-pane fade" id="custom" role="tabpanel">
+                <div class="row mt-4">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Métricas Customizadas</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="customMetricsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Adicionar Métrica Custom</h6>
+                            </div>
+                            <div class="card-body">
+                                <form id="customMetricForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nome da Métrica</label>
+                                        <input type="text" class="form-control" id="metricName" placeholder="ex: response_time">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Valor</label>
+                                        <input type="number" step="0.01" class="form-control" id="metricValue">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Unidade</label>
+                                        <select class="form-select" id="metricUnit">
+                                            <option value="ms">Milissegundos</option>
+                                            <option value="seconds">Segundos</option>
+                                            <option value="count">Contagem</option>
+                                            <option value="percent">Porcentagem</option>
+                                            <option value="bytes">Bytes</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-plus-circle me-2"></i>Adicionar Métrica
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Monitoring Dashboard Script -->
+    <script>
+        // Global variables
+        let charts = {};
+        let metricsData = {};
+        let realtimeInterval = null;
+        let healthData = {};
+
+        // Chart color schemes
+        const colors = {
+            primary: '#007bff',
+            success: '#28a745',
+            warning: '#ffc107',
+            danger: '#dc3545',
+            info: '#17a2b8',
+            secondary: '#6c757d'
+        };
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            setupEventListeners();
+            startRealtimeUpdates();
+        });
+
+        function initializeDashboard() {
+            loadSystemHealth();
+            loadPerformanceMetrics();
+            loadAlerts();
+            setupCharts();
+        }
+
+        function setupEventListeners() {
+            // Time range selector
+            document.getElementById('performanceTimeRange').addEventListener('change', function() {
+                loadPerformanceMetrics(this.value);
+            });
+
+            // Alert severity filter
+            document.getElementById('alertSeverityFilter').addEventListener('change', function() {
+                loadAlerts(this.value);
+            });
+
+            // Custom metric form
+            document.getElementById('customMetricForm').addEventListener('submit', handleCustomMetric);
+
+            // Realtime toggle
+            document.getElementById('realtimeEnabled').addEventListener('change', function() {
+                if (this.checked) {
+                    startRealtimeUpdates();
+                } else {
+                    stopRealtimeUpdates();
+                }
+            });
+
+            // Tab change events
+            document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+                tab.addEventListener('shown.bs.tab', function(e) {
+                    const target = e.target.getAttribute('data-bs-target');
+                    handleTabChange(target);
+                });
+            });
+        }
+
+        async function loadSystemHealth() {
+            try {
+                const response = await fetch('api/metrics_api.php?action=health');
+                const data = await response.json();
+
+                if (data.success) {
+                    healthData = data.data;
+                    updateSystemHealthDisplay(healthData);
+                } else {
+                    showAlert('Erro ao carregar saúde do sistema: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                console.error('Error loading system health:', error);
+                showAlert('Erro de conexão ao carregar saúde do sistema', 'danger');
+            }
+        }
+
+        function updateSystemHealthDisplay(health) {
+            // Overall health score
+            const scoreElement = document.getElementById('overallHealthScore');
+            scoreElement.textContent = health.overall_score || 0;
+            
+            // Set color based on score
+            scoreElement.className = 'health-score';
+            if (health.overall_score >= 90) scoreElement.classList.add('excellent');
+            else if (health.overall_score >= 70) scoreElement.classList.add('good');
+            else if (health.overall_score >= 50) scoreElement.classList.add('warning');
+            else scoreElement.classList.add('critical');
+
+            // Individual metrics
+            updateMetricCard('cpu', health.cpu_health || 0, 'load');
+            updateMetricCard('memory', health.memory_health || 0, '%');
+            updateMetricCard('disk', health.disk_health || 0, '%');
+            updateMetricCard('database', health.database_health || 0, 'connections');
+            updateMetricCard('cache', health.cache_health || 0, '%');
+
+            // Alerts summary
+            const alertsCount = health.alerts ? health.alerts.length : 0;
+            document.getElementById('alertsValue').textContent = alertsCount;
+
+            if (health.alerts) {
+                const severityCounts = { critical: 0, high: 0, medium: 0, low: 0 };
+                health.alerts.forEach(alert => {
+                    severityCounts[alert.severity]++;
+                });
+
+                const alertsSeverity = document.getElementById('alertsSeverity');
+                alertsSeverity.innerHTML = `
+                    <span class="badge alert-critical me-1">${severityCounts.critical}</span>
+                    <span class="badge alert-high me-1">${severityCounts.high}</span>
+                    <span class="badge alert-medium">${severityCounts.medium}</span>
+                `;
+            }
+        }
+
+        function updateMetricCard(type, value, unit) {
+            const valueElement = document.getElementById(`${type}Value`);
+            const progressElement = document.getElementById(`${type}Progress`);
+
+            if (valueElement) {
+                valueElement.textContent = formatMetricValue(value, unit);
+            }
+
+            if (progressElement) {
+                let percentage = value;
+                if (unit === '%') {
+                    percentage = Math.min(value, 100);
+                } else if (unit === 'load') {
+                    percentage = Math.min((value / 5) * 100, 100); // Assume max load of 5
+                }
+
+                progressElement.style.width = percentage + '%';
+                
+                // Set color based on value
+                progressElement.className = 'progress-bar';
+                if (percentage > 80) progressElement.classList.add('bg-danger');
+                else if (percentage > 60) progressElement.classList.add('bg-warning');
+                else progressElement.classList.add('bg-success');
+            }
+        }
+
+        async function loadPerformanceMetrics(timeRange = '1h') {
+            try {
+                const response = await fetch(`api/metrics_api.php?action=dashboard&range=${timeRange}&types=system,database,cache`);
+                const data = await response.json();
+
+                if (data.success) {
+                    metricsData = data.data;
+                    updatePerformanceChart(metricsData);
+                    loadPerformanceSnapshots();
+                } else {
+                    showAlert('Erro ao carregar métricas: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                console.error('Error loading performance metrics:', error);
+                showAlert('Erro de conexão ao carregar métricas', 'danger');
+            }
+        }
+
+        async function loadPerformanceSnapshots() {
+            try {
+                const response = await fetch('api/metrics_api.php?action=performance_snapshots&limit=10');
+                const data = await response.json();
+
+                if (data.success) {
+                    updateSnapshotsTable(data.data);
+                } else {
+                    console.warn('Error loading snapshots:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading snapshots:', error);
+            }
+        }
+
+        function updateSnapshotsTable(snapshots) {
+            const tbody = document.getElementById('snapshotsTableBody');
+            
+            if (snapshots.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Nenhum snapshot disponível</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = snapshots.map(snapshot => `
+                <tr>
+                    <td>${formatDateTime(snapshot.created_at)}</td>
+                    <td>${formatMetricValue(snapshot.cpu_usage, '%')}</td>
+                    <td>${formatMetricValue(snapshot.memory_usage, '%')}</td>
+                    <td>${formatMetricValue(snapshot.disk_usage, '%')}</td>
+                    <td>${snapshot.database_connections || '-'}</td>
+                    <td>${formatMetricValue(snapshot.cache_hit_ratio, '%')}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-info" onclick="viewSnapshotDetails(${snapshot.id})">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadAlerts(severity = '') {
+            try {
+                let url = 'api/metrics_api.php?action=alerts&limit=20';
+                if (severity) url += `&severity=${severity}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success) {
+                    updateAlertsDisplay(data.data);
+                } else {
+                    showAlert('Erro ao carregar alertas: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+                showAlert('Erro de conexão ao carregar alertas', 'danger');
+            }
+        }
+
+        function updateAlertsDisplay(alerts) {
+            const container = document.getElementById('alertsList');
+            
+            if (alerts.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-check-circle fs-1 d-block mb-2 text-success"></i>
+                        <h6>Nenhum alerta ativo</h6>
+                        <p>Sistema funcionando normalmente</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = alerts.map(alert => `
+                <div class="alert alert-${getSeverityBootstrapClass(alert.severity)} alert-dismissible" role="alert">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="alert-heading mb-1">
+                                <span class="badge alert-${alert.severity} me-2">${alert.severity.toUpperCase()}</span>
+                                ${alert.alert_type.replace('_', ' ').toUpperCase()}
+                            </h6>
+                            <p class="mb-1">${alert.message}</p>
+                            <small class="text-muted">
+                                <i class="bi bi-clock me-1"></i>${formatDateTime(alert.created_at)}
+                                <span class="ms-3">
+                                    <i class="bi bi-speedometer2 me-1"></i>Limite: ${alert.threshold_value}
+                                    | Atual: ${alert.actual_value}
+                                </span>
+                            </small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-success" onclick="resolveAlert(${alert.id})">
+                            <i class="bi bi-check"></i> Resolver
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupCharts() {
+            // Performance Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            charts.performance = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Valor'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Tempo'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Métricas de Performance em Tempo Real'
+                        }
+                    }
+                }
+            });
+
+            // Additional charts for other tabs will be initialized when needed
+        }
+
+        function updatePerformanceChart(data) {
+            if (!charts.performance) return;
+
+            const datasets = [];
+            const labels = new Set();
+
+            // Process metrics data for chart
+            Object.entries(data).forEach(([key, metric]) => {
+                if (metric.data && metric.data.length > 0) {
+                    // Collect all timestamps
+                    metric.data.forEach(point => {
+                        labels.add(formatChartTime(point.timestamp));
+                    });
+
+                    // Create dataset
+                    datasets.push({
+                        label: metric.name,
+                        data: metric.data.map(point => ({
+                            x: formatChartTime(point.timestamp),
+                            y: point.value
+                        })),
+                        borderColor: getMetricColor(metric.type),
+                        backgroundColor: getMetricColor(metric.type, 0.1),
+                        fill: false,
+                        tension: 0.1
+                    });
+                }
+            });
+
+            charts.performance.data.labels = Array.from(labels).sort();
+            charts.performance.data.datasets = datasets;
+            charts.performance.update();
+        }
+
+        function handleTabChange(target) {
+            switch (target) {
+                case '#system':
+                    loadSystemMetrics();
+                    break;
+                case '#database':
+                    loadDatabaseMetrics();
+                    break;
+                case '#custom':
+                    loadCustomMetrics();
+                    break;
+            }
+        }
+
+        async function loadSystemMetrics() {
+            // Implementation for system metrics tab
+        }
+
+        async function loadDatabaseMetrics() {
+            // Implementation for database metrics tab
+        }
+
+        async function loadCustomMetrics() {
+            // Implementation for custom metrics tab
+        }
+
+        async function handleCustomMetric(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('metricName').value;
+            const value = parseFloat(document.getElementById('metricValue').value);
+            const unit = document.getElementById('metricUnit').value;
+
+            if (!name || isNaN(value)) {
+                showAlert('Por favor, preencha todos os campos corretamente', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('api/metrics_api.php?action=custom_metric', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        value: value,
+                        unit: unit,
+                        tags: { source: 'manual' }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Métrica customizada adicionada com sucesso!', 'success');
+                    document.getElementById('customMetricForm').reset();
+                    loadCustomMetrics();
+                } else {
+                    showAlert('Erro ao adicionar métrica: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão ao adicionar métrica', 'danger');
+            }
+        }
+
+        // Utility functions
+        async function collectMetrics() {
+            showAlert('Coletando métricas do sistema...', 'info');
+            
+            try {
+                const response = await fetch('api/metrics_api.php?action=collect');
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Métricas coletadas com sucesso!', 'success');
+                    await refreshAllData();
+                } else {
+                    showAlert('Erro ao coletar métricas: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão ao coletar métricas', 'danger');
+            }
+        }
+
+        async function refreshAllData() {
+            await loadSystemHealth();
+            await loadPerformanceMetrics();
+            await loadAlerts();
+        }
+
+        async function resolveAlert(alertId) {
+            try {
+                const response = await fetch('api/metrics_api.php?action=resolve_alert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ alert_id: alertId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Alerta resolvido com sucesso!', 'success');
+                    loadAlerts();
+                } else {
+                    showAlert('Erro ao resolver alerta: ' + data.error, 'danger');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão ao resolver alerta', 'danger');
+            }
+        }
+
+        function startRealtimeUpdates() {
+            if (realtimeInterval) return;
+            
+            realtimeInterval = setInterval(() => {
+                if (document.getElementById('realtimeEnabled').checked) {
+                    loadSystemHealth();
+                }
+            }, 30000); // Update every 30 seconds
+        }
+
+        function stopRealtimeUpdates() {
+            if (realtimeInterval) {
+                clearInterval(realtimeInterval);
+                realtimeInterval = null;
+            }
+        }
+
+        function formatMetricValue(value, unit) {
+            if (value === null || value === undefined) return '-';
+            
+            switch (unit) {
+                case '%':
+                    return Math.round(value) + '%';
+                case 'bytes':
+                    return formatBytes(value);
+                case 'ms':
+                    return Math.round(value) + 'ms';
+                case 'load':
+                    return parseFloat(value).toFixed(2);
+                default:
+                    return typeof value === 'number' ? value.toFixed(2) : value;
+            }
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatDateTime(dateString) {
+            return new Date(dateString).toLocaleString('pt-BR');
+        }
+
+        function formatChartTime(dateString) {
+            return new Date(dateString).toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        function getMetricColor(type, alpha = 1) {
+            const colorMap = {
+                system: colors.primary,
+                database: colors.success,
+                cache: colors.warning,
+                application: colors.info,
+                custom: colors.secondary
+            };
+            
+            const color = colorMap[type] || colors.secondary;
+            
+            if (alpha < 1) {
+                // Convert hex to rgba
+                const hex = color.substring(1);
+                const r = parseInt(hex.substring(0, 2), 16);
+                const g = parseInt(hex.substring(2, 4), 16);
+                const b = parseInt(hex.substring(4, 6), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            }
+            
+            return color;
+        }
+
+        function getSeverityBootstrapClass(severity) {
+            const classMap = {
+                critical: 'danger',
+                high: 'warning',
+                medium: 'info',
+                low: 'secondary'
+            };
+            return classMap[severity] || 'secondary';
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert_' + Date.now();
+            
+            const alertHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert" id="${alertId}">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            alertContainer.insertAdjacentHTML('beforeend', alertHTML);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                const alertElement = document.getElementById(alertId);
+                if (alertElement) {
+                    const alert = new bootstrap.Alert(alertElement);
+                    alert.close();
+                }
+            }, 5000);
+        }
+
+        // Additional utility functions
+        function exportData() {
+            showAlert('Funcionalidade de exportação em desenvolvimento', 'info');
+        }
+
+        function clearCache() {
+            showAlert('Funcionalidade de limpeza de cache em desenvolvimento', 'info');
+        }
+
+        function optimizeDatabase() {
+            showAlert('Funcionalidade de otimização em desenvolvimento', 'info');
+        }
+
+        function runHealthCheck() {
+            collectMetrics();
+        }
+
+        function resolveAllAlerts() {
+            showAlert('Funcionalidade de resolver todos os alertas em desenvolvimento', 'info');
+        }
+
+        function viewSnapshotDetails(snapshotId) {
+            showAlert(`Visualizando detalhes do snapshot ${snapshotId}`, 'info');
+        }
+    </script>
+</body>
+</html>
