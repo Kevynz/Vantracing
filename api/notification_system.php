@@ -206,10 +206,12 @@ class VanTracingNotificationManager {
                         break;
                         
                     case 'push':
-                        if ($this->config['channels']['push']) {
-                            $this->sendWebPushNotification($user_id, $type, $title, $message, $data);
-                            $success_channels[] = 'push';
-                        }
+                        // Web Push notifications (future implementation)
+                        // Notificações Web Push (implementação futura)
+                        log_info('Web Push notification requested but not implemented yet', [
+                            'user_id' => $user_id,
+                            'type' => $type
+                        ], 'notifications');
                         break;
                 }
             } catch (Exception $e) {
