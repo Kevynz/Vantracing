@@ -284,8 +284,6 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 
 ## 🙏 Acknowledgments / Agradecimentos
 
-- Bootstrap team for the amazing UI framework / Equipe Bootstrap pelo incrível framework de UI
-- Font Awesome for the icon library / Font Awesome pela biblioteca de ícones
 - All contributors who help improve this project / Todos os contribuidores que ajudam a melhorar este projeto
 
 ---
