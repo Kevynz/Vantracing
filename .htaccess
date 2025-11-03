@@ -1,0 +1,235 @@
+# VanTracing Security Configuration
+# Configuração de Segurança VanTracing
+# Apache .htaccess file for enhanced security
+# Arquivo .htaccess do Apache para segurança aprimorada
+
+# Enable RewriteEngine / Habilitar RewriteEngine
+RewriteEngine On
+
+# Security Headers / Cabeçalhos de Segurança
+<IfModule mod_headers.c>
+    # HTTP Strict Transport Security (HSTS)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    
+    # Content Security Policy (CSP)
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https:; media-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'"
+    
+    # X-Frame-Options
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # X-Content-Type-Options
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # X-XSS-Protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Permissions Policy
+    Header always set Permissions-Policy "geolocation=(self), camera=(), microphone=()"
+    
+    # Remove server information
+    Header unset Server
+    Header unset X-Powered-By
+    
+    # Cache control for sensitive files
+    <FilesMatch "\.(php|html)$">
+        Header set Cache-Control "private, no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+    </FilesMatch>
+    
+    # Cache control for static assets
+    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+        Header set Cache-Control "public, max-age=31536000"
+    </FilesMatch>
+</IfModule>
+
+# Force HTTPS Redirect / Forçar Redirecionamento HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Protect sensitive files and directories / Proteger arquivos e diretórios sensíveis
+<FilesMatch "\.(env|log|sql|bak|config|ini|md|txt)$">
+    Require all denied
+</FilesMatch>
+
+# Protect configuration directories / Proteger diretórios de configuração
+<DirectoryMatch "/(logs|config|migrations|backups|\.git|\.svn|node_modules)/">
+    Require all denied
+</DirectoryMatch>
+
+# Deny access to PHP configuration files / Negar acesso aos arquivos de configuração PHP
+<Files "php.ini">
+    Require all denied
+</Files>
+
+<Files ".htaccess">
+    Require all denied
+</Files>
+
+<Files ".htpasswd">
+    Require all denied
+</Files>
+
+# Block access to version control files / Bloquear acesso aos arquivos de controle de versão
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Prevent directory browsing / Prevenir navegação de diretórios
+Options -Indexes
+
+# Disable server signature / Desabilitar assinatura do servidor
+ServerSignature Off
+
+# File upload security / Segurança de upload de arquivos
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+    <RequireAll>
+        Require all granted
+        # Allow PHP execution only in specific directories
+        # Permitir execução PHP apenas em diretórios específicos
+        Require expr "%{REQUEST_URI} =~ m#^/(api|JavaScript)/#"
+    </RequireAll>
+</FilesMatch>
+
+# Prevent execution of uploaded files / Prevenir execução de arquivos carregados
+<Directory "uploads">
+    <FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+        Require all denied
+    </FilesMatch>
+    php_flag engine off
+</Directory>
+
+# IP-based rate limiting (basic) / Limitação de taxa baseada em IP (básica)
+<IfModule mod_evasive24.c>
+    DOSHashTableSize    2048
+    DOSPageCount        10
+    DOSSiteCount        50
+    DOSPageInterval     1
+    DOSSiteInterval     1
+    DOSBlockingPeriod   600
+</IfModule>
+
+# Limit request size / Limitar tamanho da requisição
+<IfModule mod_security2.c>
+    SecRequestBodyLimit 10485760
+    SecRequestBodyNoFilesLimit 131072
+</IfModule>
+
+# PHP Security Settings / Configurações de Segurança PHP
+<IfModule mod_php7.c>
+    php_flag display_errors off
+    php_flag log_errors on
+    php_flag expose_php off
+    php_flag allow_url_fopen off
+    php_flag allow_url_include off
+    php_flag session.cookie_httponly on
+    php_flag session.use_only_cookies on
+    php_value session.cookie_samesite Strict
+    php_value post_max_size 10M
+    php_value upload_max_filesize 5M
+    php_value max_execution_time 30
+    php_value memory_limit 128M
+</IfModule>
+
+# Custom error pages / Páginas de erro personalizadas
+ErrorDocument 400 /error/400.html
+ErrorDocument 401 /error/401.html
+ErrorDocument 403 /error/403.html
+ErrorDocument 404 /error/404.html
+ErrorDocument 500 /error/500.html
+
+# URL Rewriting for clean URLs / Reescrita de URL para URLs limpas
+RewriteRule ^api/([^/]+)/?$ /api/$1.php [L]
+
+# Prevent hotlinking / Prevenir hotlinking
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^https://(www\.)?yourdomain\.com [NC]
+RewriteRule \.(jpg|jpeg|png|gif|css|js)$ - [F]
+
+# Block suspicious user agents / Bloquear user agents suspeitos
+<IfModule mod_setenvif.c>
+    SetEnvIfNoCase User-Agent "libwww-perl" block_ua
+    SetEnvIfNoCase User-Agent "wget" block_ua
+    SetEnvIfNoCase User-Agent "curl" block_ua
+    SetEnvIfNoCase User-Agent "Nikto" block_ua
+    SetEnvIfNoCase User-Agent "sqlmap" block_ua
+    SetEnvIfNoCase User-Agent "fimap" block_ua
+    SetEnvIfNoCase User-Agent "nessus" block_ua
+    SetEnvIfNoCase User-Agent "whatweb" block_ua
+    SetEnvIfNoCase User-Agent "Openvas" block_ua
+    
+    <RequireAll>
+        Require all granted
+        Require not env block_ua
+    </RequireAll>
+</IfModule>
+
+# Block common attack patterns / Bloquear padrões de ataque comuns
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} \.\./\.\./\.\./etc/passwd [OR]
+RewriteCond %{QUERY_STRING} (;|<|>|'|"|\)|%0A|%0D|%22|%27|%3C|%3E|%00).*(/\*|union|select|insert|drop|delete|update|cast|create|char|convert|alter|declare|or|and|1=1|1=0) [NC]
+RewriteRule .* - [F]
+
+# Block SQL injection attempts / Bloquear tentativas de injeção SQL
+RewriteCond %{REQUEST_METHOD} GET
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=http:// [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=(\.\.//?)+ [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=/([a-z0-9_.]//?)+ [NC]
+RewriteRule .* - [F]
+
+# Enable compression / Habilitar compressão
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Enable ETags / Habilitar ETags
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/ico "access plus 1 year"
+    ExpiresByType image/icon "access plus 1 year"
+    ExpiresByType text/html "access plus 1 hour"
+</IfModule>
+
+# Prevent access to backup files / Prevenir acesso a arquivos de backup
+<FilesMatch "\.(bak|backup|old|orig|save|swp|tmp)$">
+    Require all denied
+</FilesMatch>
+
+# Additional security for uploads directory / Segurança adicional para diretório de uploads
+<Directory "uploads">
+    Options -ExecCGI
+    AddHandler cgi-script .php .pl .py .jsp .asp .sh .cgi
+    Options -Indexes
+</Directory>
+
+# Limit access to API endpoints by IP (optional) / Limitar acesso aos endpoints da API por IP (opcional)
+# Uncomment and modify as needed / Descomente e modifique conforme necessário
+# <Directory "api">
+#     <RequireAll>
+#         Require all granted
+#         Require ip 192.168.1
+#         Require ip 10.0.0
+#     </RequireAll>
+# </Directory>
+
+# Custom MIME types / Tipos MIME personalizados
+<IfModule mod_mime.c>
+    AddType application/javascript .js
+    AddType text/css .css
+</IfModule>
+
+# Prevent clickjacking / Prevenir clickjacking
+<IfModule mod_headers.c>
+    Header always append X-Frame-Options SAMEORIGIN
+</IfModule>

@@ -81,6 +81,19 @@ try {
     
     // Se tudo correu bem, confirma a transação
     $conn->commit();
+    
+    // Send welcome email / Enviar email de boas-vindas
+    try {
+        require_once 'email_notifications.php';
+        sendNotification('welcome', [
+            'email' => $email,
+            'name' => $nome,
+            'role' => $role
+        ]);
+    } catch (Exception $e) {
+        error_log("Failed to send welcome email: " . $e->getMessage());
+    }
+    
     send_response(true, 'Utilizador registado com sucesso!');
 
 } catch (Exception $e) {

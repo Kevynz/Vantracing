@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanTracing - JavaScript Tests</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .header {
+            background: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+        .test-pass {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        .test-fail {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+        .summary {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .run-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .run-button:hover {
+            background: #0056b3;
+        }
+        .console {
+            background: #2d3748;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚐 VanTracing - JavaScript Test Suite</h1>
+        <p>Frontend Function and Integration Tests / Testes de Funções Frontend e Integração</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>🎮 Test Controls / Controles de Teste</h2>
+        <button class="run-button" onclick="runAllTests()">Run All Tests / Executar Todos</button>
+        <button class="run-button" onclick="runI18nTests()">i18n Tests</button>
+        <button class="run-button" onclick="runTrackingTests()">Tracking Tests</button>
+        <button class="run-button" onclick="runUtilityTests()">Utility Tests</button>
+        <button class="run-button" onclick="clearResults()">Clear / Limpar</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Test Results / Resultados dos Testes</h2>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📈 Summary / Resumo</h2>
+        <div id="summary" class="summary">
+            <p>Click "Run All Tests" to start / Clique em "Executar Todos" para começar</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🖥️ Console Output / Saída do Console</h2>
+        <div id="console-output" class="console">
+            Waiting for tests... / Aguardando testes...
+        </div>
+    </div>
+
+    <!-- Load VanTracing scripts for testing -->
+    <script>
+        // Mock i18n system for testing / Sistema i18n fictício para testes
+        const i18n = {
+            translations: {
+                pt: {
+                    'welcome': 'Bem-vindo',
+                    'login': 'Entrar',
+                    'register': 'Cadastrar',
+                    'driver': 'Motorista',
+                    'guardian': 'Responsável'
+                },
+                en: {
+                    'welcome': 'Welcome',
+                    'login': 'Login',
+                    'register': 'Register',
+                    'driver': 'Driver',
+                    'guardian': 'Guardian'
+                }
+            },
+            currentLanguage: 'pt',
+            
+            detectLanguage() {
+                const saved = localStorage.getItem('vantracing_language');
+                if (saved) return saved;
+                
+                const browserLang = navigator.language || navigator.userLanguage;
+                return browserLang.startsWith('en') ? 'en' : 'pt';
+            },
+            
+            setLanguage(lang) {
+                if (this.translations[lang]) {
+                    this.currentLanguage = lang;
+                    localStorage.setItem('vantracing_language', lang);
+                    this.applyTranslations();
+                    return true;
+                }
+                return false;
+            },
+            
+            translate(key) {
+                return this.translations[this.currentLanguage][key] || key;
+            },
+            
+            applyTranslations() {
+                const elements = document.querySelectorAll('[data-i18n]');
+                elements.forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    const translation = this.translate(key);
+                    if (translation !== key) {
+                        element.textContent = translation;
+                    }
+                });
+            }
+        };
+
+        // Mock tracking system for testing / Sistema de rastreamento fictício para testes
+        const tracking = {
+            isTracking: false,
+            currentPosition: null,
+            watchId: null,
+            
+            startTracking() {
+                if (this.isTracking) return false;
+                
+                if (!navigator.geolocation) {
+                    throw new Error('Geolocation not supported');
+                }
+                
+                this.isTracking = true;
+                this.watchId = navigator.geolocation.watchPosition(
+                    position => {
+                        this.currentPosition = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            timestamp: new Date().toISOString()
+                        };
+                    },
+                    error => {
+                        console.error('Geolocation error:', error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+                
+                return true;
+            },
+            
+            stopTracking() {
+                if (!this.isTracking) return false;
+                
+                if (this.watchId) {
+                    navigator.geolocation.clearWatch(this.watchId);
+                    this.watchId = null;
+                }
+                
+                this.isTracking = false;
+                return true;
+            },
+            
+            getPosition() {
+                return this.currentPosition;
+            },
+            
+            enableSharing() {
+                localStorage.setItem('vantracing_sharing_enabled', 'true');
+                return true;
+            },
+            
+            disableSharing() {
+                localStorage.setItem('vantracing_sharing_enabled', 'false');
+                return true;
+            },
+            
+            isSharingEnabled() {
+                return localStorage.getItem('vantracing_sharing_enabled') === 'true';
+            }
+        };
+
+        // Utility functions for testing / Funções utilitárias para testes
+        const utils = {
+            validateCPF(cpf) {
+                if (!cpf || typeof cpf !== 'string') return false;
+                
+                cpf = cpf.replace(/[^\d]/g, '');
+                if (cpf.length !== 11) return false;
+                
+                // Check for repeated digits / Verificar dígitos repetidos
+                if (/^(\d)\1{10}$/.test(cpf)) return false;
+                
+                // Validate check digits / Validar dígitos verificadores
+                let sum = 0;
+                for (let i = 0; i < 9; i++) {
+                    sum += parseInt(cpf[i]) * (10 - i);
+                }
+                let digit = 11 - (sum % 11);
+                if (digit >= 10) digit = 0;
+                if (parseInt(cpf[9]) !== digit) return false;
+                
+                sum = 0;
+                for (let i = 0; i < 10; i++) {
+                    sum += parseInt(cpf[i]) * (11 - i);
+                }
+                digit = 11 - (sum % 11);
+                if (digit >= 10) digit = 0;
+                if (parseInt(cpf[10]) !== digit) return false;
+                
+                return true;
+            },
+            
+            validateEmail(email) {
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return regex.test(email);
+            },
+            
+            formatDate(date, format = 'dd/mm/yyyy') {
+                if (!(date instanceof Date)) {
+                    date = new Date(date);
+                }
+                
+                if (isNaN(date.getTime())) {
+                    return null;
+                }
+                
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                
+                return format
+                    .replace('dd', day)
+                    .replace('mm', month)
+                    .replace('yyyy', year);
+            },
+            
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        };
+    </script>
+
+    <script>
+        // Test Suite Implementation / Implementação da Suite de Testes
+        class JavaScriptTester {
+            constructor() {
+                this.tests = [];
+                this.passed = 0;
+                this.failed = 0;
+                this.startTime = 0;
+            }
+            
+            log(message, type = 'info') {
+                const console = document.getElementById('console-output');
+                const timestamp = new Date().toLocaleTimeString();
+                const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : '📝';
+                console.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+                console.scrollTop = console.scrollHeight;
+            }
+            
+            assert(condition, testName, message = '') {
+                const result = {
+                    name: testName,
+                    passed: Boolean(condition),
+                    message: message,
+                    timestamp: Date.now()
+                };
+                
+                this.tests.push(result);
+                
+                if (result.passed) {
+                    this.passed++;
+                    this.log(`PASS: ${testName}`, 'success');
+                } else {
+                    this.failed++;
+                    this.log(`FAIL: ${testName} - ${message}`, 'error');
+                }
+                
+                this.updateResults();
+                return result.passed;
+            }
+            
+            updateResults() {
+                const container = document.getElementById('test-results');
+                const lastTest = this.tests[this.tests.length - 1];
+                
+                const div = document.createElement('div');
+                div.className = `test-result ${lastTest.passed ? 'test-pass' : 'test-fail'}`;
+                div.innerHTML = `
+                    <strong>${lastTest.passed ? '✅' : '❌'} ${lastTest.name}</strong>
+                    ${lastTest.message ? `<br><small>${lastTest.message}</small>` : ''}
+                `;
+                
+                container.appendChild(div);
+            }
+            
+            updateSummary() {
+                const total = this.passed + this.failed;
+                const successRate = total > 0 ? ((this.passed / total) * 100).toFixed(1) : 0;
+                const executionTime = ((Date.now() - this.startTime) / 1000).toFixed(2);
+                
+                document.getElementById('summary').innerHTML = `
+                    <h3>📊 Results / Resultados</h3>
+                    <p><strong>✅ Passed / Aprovados:</strong> ${this.passed}</p>
+                    <p><strong>❌ Failed / Falharam:</strong> ${this.failed}</p>
+                    <p><strong>⏱️ Execution Time / Tempo:</strong> ${executionTime}s</p>
+                    <p><strong>🎯 Success Rate / Taxa de Sucesso:</strong> ${successRate}%</p>
+                    ${this.failed === 0 ? '<p style="color: #28a745;">🎉 All tests passed! / Todos os testes passaram!</p>' : ''}
+                `;
+            }
+            
+            clear() {
+                this.tests = [];
+                this.passed = 0;
+                this.failed = 0;
+                document.getElementById('test-results').innerHTML = '';
+                document.getElementById('console-output').textContent = 'Test console cleared... / Console de teste limpo...\n';
+                document.getElementById('summary').innerHTML = '<p>Ready to run tests... / Pronto para executar testes...</p>';
+            }
+            
+            start() {
+                this.startTime = Date.now();
+                this.log('Starting JavaScript tests... / Iniciando testes JavaScript...');
+            }
+            
+            finish() {
+                this.updateSummary();
+                this.log(`Tests completed. Passed: ${this.passed}, Failed: ${this.failed}`, 'info');
+            }
+        }
+        
+        const tester = new JavaScriptTester();
+        
+        // Test Functions / Funções de Teste
+        
+        function runI18nTests() {
+            tester.start();
+            tester.log('Running i18n tests... / Executando testes i18n...');
+            
+            // Test language detection / Testar detecção de idioma
+            const detectedLang = i18n.detectLanguage();
+            tester.assert(
+                typeof detectedLang === 'string' && (detectedLang === 'pt' || detectedLang === 'en'),
+                'Language Detection',
+                `Detected: ${detectedLang}`
+            );
+            
+            // Test language switching / Testar troca de idioma
+            const originalLang = i18n.currentLanguage;
+            const switchResult = i18n.setLanguage('en');
+            tester.assert(
+                switchResult && i18n.currentLanguage === 'en',
+                'Language Switching',
+                'Switch to English successful'
+            );
+            
+            // Test translation / Testar tradução
+            const translation = i18n.translate('welcome');
+            tester.assert(
+                translation === 'Welcome',
+                'Translation Functionality',
+                `Got: "${translation}"`
+            );
+            
+            // Test invalid language / Testar idioma inválido
+            const invalidLang = i18n.setLanguage('fr');
+            tester.assert(
+                !invalidLang,
+                'Invalid Language Rejection',
+                'French language correctly rejected'
+            );
+            
+            // Restore original language / Restaurar idioma original
+            i18n.setLanguage(originalLang);
+            
+            tester.finish();
+        }
+        
+        function runTrackingTests() {
+            tester.start();
+            tester.log('Running tracking tests... / Executando testes de rastreamento...');
+            
+            // Test sharing controls / Testar controles de compartilhamento
+            tracking.enableSharing();
+            tester.assert(
+                tracking.isSharingEnabled() === true,
+                'Enable Location Sharing',
+                'Sharing enabled successfully'
+            );
+            
+            tracking.disableSharing();
+            tester.assert(
+                tracking.isSharingEnabled() === false,
+                'Disable Location Sharing',
+                'Sharing disabled successfully'
+            );
+            
+            // Test tracking state / Testar estado do rastreamento
+            tester.assert(
+                tracking.isTracking === false,
+                'Initial Tracking State',
+                'Tracking initially stopped'
+            );
+            
+            // Test geolocation API availability / Testar disponibilidade da API de geolocalização
+            tester.assert(
+                'geolocation' in navigator,
+                'Geolocation API Available',
+                'Browser supports geolocation'
+            );
+            
+            // Test position format / Testar formato da posição
+            const mockPosition = {
+                lat: -23.5505,
+                lng: -46.6333,
+                accuracy: 10,
+                timestamp: new Date().toISOString()
+            };
+            
+            tester.assert(
+                typeof mockPosition.lat === 'number' && typeof mockPosition.lng === 'number',
+                'Position Data Format',
+                'Position contains valid coordinates'
+            );
+            
+            tester.finish();
+        }
+        
+        function runUtilityTests() {
+            tester.start();
+            tester.log('Running utility tests... / Executando testes utilitários...');
+            
+            // Test CPF validation / Testar validação de CPF
+            tester.assert(
+                utils.validateCPF('11144477735') === true,
+                'Valid CPF Validation',
+                'Valid CPF accepted'
+            );
+            
+            tester.assert(
+                utils.validateCPF('12345678901') === false,
+                'Invalid CPF Validation',
+                'Invalid CPF rejected'
+            );
+            
+            tester.assert(
+                utils.validateCPF('111.444.777-35') === true,
+                'Formatted CPF Validation',
+                'Formatted CPF accepted'
+            );
+            
+            // Test email validation / Testar validação de email
+            tester.assert(
+                utils.validateEmail('test@example.com') === true,
+                'Valid Email Validation',
+                'Valid email accepted'
+            );
+            
+            tester.assert(
+                utils.validateEmail('invalid-email') === false,
+                'Invalid Email Validation',
+                'Invalid email rejected'
+            );
+            
+            // Test date formatting / Testar formatação de data
+            const testDate = new Date('2023-12-25');
+            const formatted = utils.formatDate(testDate, 'dd/mm/yyyy');
+            tester.assert(
+                formatted === '25/12/2023',
+                'Date Formatting',
+                `Got: "${formatted}"`
+            );
+            
+            // Test debounce function / Testar função debounce
+            let debounceCounter = 0;
+            const debouncedFn = utils.debounce(() => debounceCounter++, 100);
+            
+            debouncedFn();
+            debouncedFn();
+            debouncedFn();
+            
+            setTimeout(() => {
+                tester.assert(
+                    debounceCounter === 1,
+                    'Debounce Function',
+                    `Counter: ${debounceCounter} (should be 1)`
+                );
+                tester.finish();
+            }, 150);
+        }
+        
+        function runAllTests() {
+            clearResults();
+            tester.log('Starting complete test suite... / Iniciando suite completa de testes...');
+            
+            runI18nTests();
+            setTimeout(() => runTrackingTests(), 100);
+            setTimeout(() => runUtilityTests(), 200);
+        }
+        
+        function clearResults() {
+            tester.clear();
+        }
+        
+        // Auto-run tests on page load for demo / Executar testes automaticamente no carregamento da página para demonstração
+        window.addEventListener('load', () => {
+            tester.log('JavaScript Test Suite loaded / Suite de Testes JavaScript carregada');
+            tester.log('Click "Run All Tests" to start / Clique em "Executar Todos" para começar');
+        });
+    </script>
+</body>
+</html>

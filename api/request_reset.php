@@ -58,16 +58,35 @@ $stmt_update = $conn->prepare("INSERT INTO password_resets (email, token, expire
 $stmt_update->bind_param("sssss", $email, $token, $expires_at, $token, $expires_at);
 $stmt_update->execute();
 
-// 4. Enviar o e-mail para o usuário.
-// ######################################################################################
-// IMPORTANTE: Esta parte é uma SIMULAÇÃO. Em um projeto real, você usaria uma
-// biblioteca como o PHPMailer para enviar um e-mail de verdade para o usuário com o código.
-// ######################################################################################
-$is_email_sent = true; // Simula que o e-mail foi enviado com sucesso.
+// 4. Get user name and send password reset email / Obter nome do usuário e enviar email de redefinição
+$user = $result->fetch_assoc();
+$stmt_name = $conn->prepare("SELECT nome FROM usuarios WHERE email = ?");
+$stmt_name->bind_param("s", $email);
+$stmt_name->execute();
+$user_result = $stmt_name->get_result();
+$user_name = $user_result->fetch_assoc()['nome'] ?? 'Usuário';
+
+// Send password reset email / Enviar email de redefinição de senha
+$is_email_sent = true;
+try {
+    require_once 'email_notifications.php';
+    $is_email_sent = sendNotification('password_reset', [
+        'email' => $email,
+        'name' => $user_name,
+        'token' => $token
+    ]);
+} catch (Exception $e) {
+    error_log("Failed to send password reset email: " . $e->getMessage());
+    $is_email_sent = false;
+}
 
 if ($is_email_sent) {
-    // Retorna uma resposta de sucesso. Incluímos o 'token_para_teste' para que você possa testar a funcionalidade sem configurar um e-mail.
-    send_json_response(true, 'Um código de recuperação foi enviado para seu e-mail.', ['token_para_teste' => $token]);
+    // Return success response with test token for development / Retorna resposta de sucesso com token de teste para desenvolvimento
+    $response_data = ['token_para_teste' => $token];
+    if (getenv('APP_DEBUG') === 'true') {
+        $response_data['debug_token'] = $token;
+    }
+    send_json_response(true, 'Um código de recuperação foi enviado para seu e-mail.', $response_data);
 } else {
     send_json_response(false, 'Não foi possível enviar o e-mail de recuperação.');
 }
