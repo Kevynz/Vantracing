@@ -28,9 +28,45 @@ config.local.php
 api/.env
 api/config.php
 api/db_config.php
+api/db_connect.php
 vantracing_db.sql
+vantracing_db
 *_backup.sql
 database_*.sql
+*.dump
+*.sql.gz
+*.sql.bz2
+
+# Security and monitoring sensitive data / Dados sensíveis de segurança e monitoramento  
+logs/
+cache/
+temp/
+tmp/
+backups/
+backup/
+uploads/
+sessions/
+api/logs/
+api/cache/
+api/backups/
+api/uploads/
+api/sessions/
+monitoring/data/
+metrics/
+performance_data/
+system_health/
+alerts/
+
+# SSL Certificates and Keys / Certificados SSL e chaves
+ssl/
+certs/
+certificates/
+keys/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
 
 # ============================================================================
 # IDE AND EDITOR FILES / ARQUIVOS DE IDE E EDITORES
